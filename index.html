@@ -447,6 +447,11 @@ h1.big em{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400
   </div>
 
   <div class="card">
+    <h2>Career by format <span class="sub">CricClubs baseline + every innings you log · auto-recalculates</span></h2>
+    <div id="fmtStats"></div>
+  </div>
+
+  <div class="card">
     <h2>Last 14 days <span class="sub">minutes trained</span></h2>
     <div class="chart" id="volChart"></div>
   </div>
@@ -468,6 +473,7 @@ h1.big em{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400
     <h2>Log innings</h2>
     <div class="frm">
       <input type="date" id="mDate">
+      <select id="mFmt"><option>T20</option><option>One Day (50 ov)</option><option>T10</option><option>T30/T40</option><option>Multi-day</option><option>Practice match</option></select>
       <input id="mOpp" placeholder="Opposition / tournament">
       <input type="number" id="mRuns" placeholder="Runs" min="0">
       <input type="number" id="mBalls" placeholder="Balls" min="0">
@@ -476,6 +482,29 @@ h1.big em{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400
       <button class="btn wide" onclick="addMatch()">Log innings</button>
     </div>
     <div id="matchList"></div>
+  </div>
+
+  <div class="card">
+    <h2>Career baseline — import your whole history in one shot</h2>
+    <p class="mut" style="margin-bottom:11px">Too many old games to log one-by-one. Open your CricClubs profile, read your career totals for each format, enter them here ONCE. Every innings you log above stacks on top — average and strike rate stay true to your full career.</p>
+    <div class="frm">
+      <select id="bFmt" onchange="loadBaseline()"><option>T20</option><option>One Day (50 ov)</option><option>T10</option><option>T30/T40</option><option>Multi-day</option><option>Practice match</option></select>
+      <input type="number" id="bInns" placeholder="Innings" min="0">
+      <input type="number" id="bRuns" placeholder="Runs" min="0">
+      <input type="number" id="bBalls" placeholder="Balls faced" min="0">
+      <input type="number" id="bNO" placeholder="Not outs" min="0">
+      <button class="btn" onclick="saveBaseline()">Save baseline</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>CricClubs <span class="sub">your official league stats</span></h2>
+    <div class="frm">
+      <input id="ccId" placeholder="Paste your CricClubs profile link (Share → Copy link) or player ID" class="wide">
+      <button class="btn" onclick="saveCC()">Save</button>
+    </div>
+    <div id="ccLink"></div>
+    <p class="mut" style="margin-top:9px">Official scorecards live on CricClubs — one tap to open your profile and cross-check. CricClubs doesn't offer a public feed this private page can pull from, so log each innings above too (20 seconds) and your per-format averages stay live here.</p>
   </div>
 </section>
 
@@ -650,12 +679,12 @@ var DEFAULT_GOALS=[
 ];
 var S=load();
 function load(){
-  try{var raw=localStorage.getItem(KEY);if(raw){var d=JSON.parse(raw);if(d&&d.courses){if(!d.plans)d.plans={};return d;}}}catch(e){}
+  try{var raw=localStorage.getItem(KEY);if(raw){var d=JSON.parse(raw);if(d&&d.courses){if(!d.plans)d.plans={};if(!d.baseline)d.baseline={};if(d.cricclubs===undefined)d.cricclubs='';return d;}}}catch(e){}
   return {
     habits:DEFAULT_HABITS.slice(),
     days:{},
     courses:DEFAULT_COURSES.map(function(c,i){return {id:'c'+i,name:c[0],tag:c[1],term:c[2],pct:0,grade:''};}),
-    sessions:[],matches:[],weights:[],prs:[],plans:{},
+    sessions:[],matches:[],weights:[],prs:[],plans:{},baseline:{},cricclubs:'',
     goals:DEFAULT_GOALS.map(function(g,i){return {id:'g'+i,phase:g[0],name:g[1],done:false};}),
     sat:{date:'2026-09-12',goal:1450,tests:[]},
     wo:{doneDate:'',pick:{},counts:{}}
@@ -1314,10 +1343,11 @@ function renderCricket(){
   document.getElementById('kHrs').innerHTML=Math.round(totMin/60)+'<em>h</em>';
   var now=new Date(),mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));mon.setHours(0,0,0,0);
   document.getElementById('kSesWk').textContent=S.sessions.filter(function(s){return new Date(s.date+'T12:00:00')>=mon;}).length;
-  var runs=0,balls=0,outs=0;
-  S.matches.forEach(function(m){runs+=(+m.runs||0);balls+=(+m.balls||0);if(m.out==='out')outs++;});
-  document.getElementById('kAvg').textContent=outs?(Math.round(runs/outs*10)/10):(S.matches.length?runs+'*':'—');
-  document.getElementById('kSr').textContent=balls?Math.round(runs/balls*1000)/10:'—';
+  var tot={inns:0,runs:0,balls:0,outs:0};
+  FMTS.forEach(function(f){var a=fmtAgg(f);tot.inns+=a.inns;tot.runs+=a.runs;tot.balls+=a.balls;tot.outs+=a.outs;});
+  document.getElementById('kAvg').textContent=tot.outs?(Math.round(tot.runs/tot.outs*10)/10):(tot.inns?tot.runs+'*':'—');
+  document.getElementById('kSr').textContent=tot.balls?Math.round(tot.runs/tot.balls*1000)/10:'—';
+  renderFmtStats();renderCC();
   // volume chart
   var el=document.getElementById('volChart'),html='',max=1,vals=[];
   for(var i=13;i>=0;i--){var k=daysAgoKey(i),m2=minutesOn(k);vals.push([k,m2]);if(m2>max)max=m2;}
@@ -1339,12 +1369,59 @@ function renderCricket(){
   S.matches.slice(-8).reverse().forEach(function(m){
     var sr=(+m.balls)?Math.round((+m.runs)/(+m.balls)*1000)/10:null;
     mh+='<div class="log"><div class="d">'+fmtD(m.date)+'</div><div class="b">'+
-      '<div class="t1">'+(+m.runs||0)+(m.out==='no'?'*':'')+' ('+(+m.balls||0)+')'+(sr!=null?' · SR '+sr:'')+
+      '<div class="t1"><span class="pill p-match">'+esc((m.fmt||'—').replace(' (50 ov)',''))+'</span>'+
+      (+m.runs||0)+(m.out==='no'?'*':'')+' ('+(+m.balls||0)+')'+(sr!=null?' · SR '+sr:'')+
       ' <span class="t2" style="display:inline">vs '+esc(m.opp||'—')+'</span></div>'+
       (m.note?'<div class="t2">'+esc(m.note)+'</div>':'')+'</div>'+
       '<button class="xdel" onclick="delMatch('+m.ts+')">✕</button></div>';
   });
   document.getElementById('matchList').innerHTML=mh||'<div class="empty">No innings yet — first match coming</div>';
+}
+var FMTS=['T20','One Day (50 ov)','T10','T30/T40','Multi-day','Practice match'];
+function fmtAgg(f){
+  var b=S.baseline[f]||{inns:0,runs:0,balls:0,no:0};
+  var a={inns:+b.inns||0,runs:+b.runs||0,balls:+b.balls||0,outs:Math.max(0,(+b.inns||0)-(+b.no||0))};
+  S.matches.forEach(function(m){
+    if((m.fmt||'T20')!==f)return;
+    a.inns++;a.runs+=(+m.runs||0);a.balls+=(+m.balls||0);if(m.out==='out')a.outs++;
+  });
+  return a;
+}
+function renderFmtStats(){
+  var el=document.getElementById('fmtStats'),html='';
+  FMTS.forEach(function(f){
+    var a=fmtAgg(f);if(!a.inns)return;
+    var avg=a.outs?(Math.round(a.runs/a.outs*10)/10):(a.runs+'*');
+    var sr=a.balls?Math.round(a.runs/a.balls*1000)/10:'—';
+    html+='<div class="ex"><span class="en">'+esc(f.replace(' (50 ov)',''))+'</span><span class="ev">'+a.inns+' inns · '+a.runs+' runs · avg '+avg+' · SR '+sr+'</span></div>';
+  });
+  el.innerHTML=html||'<div class="empty">Log an innings, or enter your CricClubs career baseline below — whole history in 2 minutes</div>';
+}
+function loadBaseline(){
+  var f=document.getElementById('bFmt').value,b=S.baseline[f]||{};
+  document.getElementById('bInns').value=b.inns||'';
+  document.getElementById('bRuns').value=b.runs||'';
+  document.getElementById('bBalls').value=b.balls||'';
+  document.getElementById('bNO').value=b.no||'';
+}
+function saveBaseline(){
+  var f=document.getElementById('bFmt').value;
+  S.baseline[f]={inns:+document.getElementById('bInns').value||0,runs:+document.getElementById('bRuns').value||0,
+    balls:+document.getElementById('bBalls').value||0,no:+document.getElementById('bNO').value||0};
+  save();renderCricket();renderHome();toast(f.replace(' (50 ov)','')+' baseline saved — stats updated');
+}
+function saveCC(){
+  S.cricclubs=document.getElementById('ccId').value.trim();
+  save();renderCC();toast(S.cricclubs?'CricClubs profile saved':'Cleared');
+}
+function renderCC(){
+  var el=document.getElementById('ccLink'),v=S.cricclubs||'';
+  var inp=document.getElementById('ccId');
+  if(inp&&!inp.value&&v&&document.activeElement!==inp)inp.value=v;
+  if(!v){el.innerHTML='';return;}
+  el.innerHTML=(v.indexOf('http')===0)
+    ?'<a href="'+esc(v)+'" target="_blank" rel="noopener" class="btn2" style="display:inline-block;margin-top:6px;text-decoration:none">Open my CricClubs profile ↗</a>'
+    :'<div class="mut" style="margin-top:6px">Saved ID: <b style="color:var(--txt)">'+esc(v)+'</b> · <a href="https://cricclubs.com" target="_blank" rel="noopener" style="color:var(--acc)">open CricClubs ↗</a></div>';
 }
 function addSession(){
   var min=+document.getElementById('lgMin').value,dt=document.getElementById('lgDate').value;
@@ -1360,7 +1437,7 @@ function addMatch(){
   if(!dt||runs===''){toast('Date + runs needed');return;}
   S.matches.push({ts:Date.now(),date:dt,opp:document.getElementById('mOpp').value.trim(),runs:+runs,
     balls:+document.getElementById('mBalls').value||0,out:document.getElementById('mOut').value,
-    note:document.getElementById('mNote').value.trim()});
+    fmt:document.getElementById('mFmt').value,note:document.getElementById('mNote').value.trim()});
   ['mOpp','mRuns','mBalls','mNote'].forEach(function(i){document.getElementById(i).value='';});
   save();renderCricket();renderHome();toast('Innings logged');
 }
@@ -1456,6 +1533,8 @@ function importData(ev){
       if(!d.sat)d.sat={date:'2026-09-12',goal:1450,tests:[]};
       if(!d.wo)d.wo={doneDate:'',pick:{},counts:{}};
       if(!d.plans)d.plans={};
+      if(!d.baseline)d.baseline={};
+      if(d.cricclubs===undefined)d.cricclubs='';
       S=d;save();renderAll();toast('Backup restored');
     }catch(e){toast('Invalid backup file');}
   };
@@ -1500,6 +1579,7 @@ function finishWelcome(){
 }
 renderAll();
 loadJournalFor(today());
+loadBaseline();
 initWelcome();
 </script>
 </body>
