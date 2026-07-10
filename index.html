@@ -1481,6 +1481,7 @@ function ccImport(){
   prog.textContent='Reading your profile…';
   document.getElementById('ccPreview').innerHTML='';
   ccFetch(u).then(function(html){
+    if(/Just a moment|_cf_chl_opt|challenge-platform/.test(html)){ccShowPaste();return;}
     var p=ccParse(html,ccLeagueName(u));
     CC_ROWS=p.rows;
     var queue=[];
@@ -1496,9 +1497,35 @@ function ccImport(){
       }).catch(function(){setTimeout(next,250);});
     }
     next();
-  }).catch(function(e){
-    prog.textContent='Could not reach CricClubs through the site server ('+e.message+'). Hard-refresh the live site and try again.';
+  }).catch(function(e){ccShowPaste();});
+}
+function ccShowPaste(){
+  document.getElementById('ccProg').textContent='CricClubs blocks server fetches (Cloudflare) — use the 10-second manual import:';
+  document.getElementById('ccPreview').innerHTML=
+    '<div class="mut" style="margin:6px 0 8px;line-height:1.6">1. Open your profile (Save link → Open) &nbsp;2. Select the whole page (Cmd/Ctrl+A) and copy &nbsp;3. Paste here — one row per series comes out the other side:</div>'+
+    '<textarea id="ccPasteBox" rows="6" placeholder="Paste your whole CricClubs profile page here…"></textarea>'+
+    '<button class="btn" style="margin-top:9px" onclick="ccPasteParse()">Parse my stats</button>';
+}
+function ccPasteParse(){
+  var t=(document.getElementById('ccPasteBox').value||'');
+  var m=t.match(/BATTING\s+STATISTICS([\s\S]*?)(BOWLING\s+STATISTICS|$)/i);
+  var seg=m?m[1]:t;
+  CC_ROWS=[];
+  seg.split(/\n/).forEach(function(line){
+    var tok=line.trim().split(/[\s\t]+/).filter(Boolean);
+    if(tok.length<11)return;
+    var j=tok.length;
+    while(j>0&&/^[\d.]+$/.test(tok[j-1]))j--;
+    var nums=tok.slice(j);
+    if(nums.length<10)return;
+    var series=tok.slice(0,j).join(' ');
+    if(!series||/series|type/i.test(series))return;
+    var inns=+nums[1]||0,no=+nums[2]||0,runs=+nums[3]||0,balls=+nums[4]||0;
+    if(!inns&&!runs)return;
+    CC_ROWS.push({league:'CricClubs',series:series,inns:inns,no:no,runs:runs,balls:balls,fmt:ccGuess(series),use:true});
   });
+  if(!CC_ROWS.length){document.getElementById('ccProg').textContent='Nothing parsed — make sure you copied the whole profile page including the BATTING STATISTICS table.';return;}
+  ccDone();
 }
 function ccDone(){
   var prog=document.getElementById('ccProg');
