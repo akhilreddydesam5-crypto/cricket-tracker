@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c10">
+<title>Akhil — Cricket Scholar</title>
+<style>
+:root{
+  --bg:#0a0c10; --bg2:#0e1117; --card:#12151c; --card2:#171b24; --line:#1f242e; --line2:#2a303c;
+  --txt:#f2f5fa; --mut:#98a3b5; --dim:#5d6779;
+  --acc:#34d399; --acc-d:#10b981; --amb:#fbbf24; --red:#f87171; --blu:#7dd3fc; --vio:#c4b5fd;
+  --r:16px; --tr:.22s cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:88px;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  font-feature-settings:'tnum';-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:15px;background:var(--bg2);border:1px solid var(--line);
+  color:var(--txt);border-radius:11px;padding:10px 13px;outline:none;width:100%;transition:border-color var(--tr)}
+input:focus,select:focus,textarea:focus{border-color:var(--acc)}
+::placeholder{color:var(--dim)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:60;background:rgba(10,12,16,.85);backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);
+  padding:15px 20px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:16px;font-weight:800;letter-spacing:-.2px}
+.brand b{color:var(--acc);font-weight:800}
+.streak{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+  padding:7px 14px;border-radius:99px;font-weight:700;font-size:13.5px;transition:transform var(--tr)}
+.streak:active{transform:scale(.96)}
+.streak svg{width:15px;height:15px}
+
+/* ---------- nav ---------- */
+nav{position:fixed;bottom:0;left:0;right:0;z-index:60;background:rgba(14,17,23,.92);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;padding:9px 6px calc(9px + env(safe-area-inset-bottom))}
+nav button{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--dim);
+  padding:5px 10px;border-radius:12px;font-weight:700;letter-spacing:.2px;min-width:50px;transition:color var(--tr)}
+nav button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round;transition:transform var(--tr)}
+nav button.on{color:var(--acc)}
+nav button.on svg{transform:translateY(-1px) scale(1.08)}
+@media(min-width:880px){
+  body{padding-bottom:24px}
+  nav{position:sticky;top:61px;bottom:auto;border-top:0;border-bottom:1px solid var(--line);
+    justify-content:center;gap:4px;padding:9px}
+  nav button{flex-direction:row;font-size:13px;gap:8px;padding:9px 18px;border-radius:99px}
+  nav button.on{background:var(--card2);box-shadow:inset 0 0 0 1px var(--line2)}
+}
+
+main{max-width:1020px;margin:0 auto;padding:22px 18px}
+.pg{display:none}
+.pg.on{display:block;animation:pageIn .28s cubic-bezier(.3,.7,.4,1)}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- primitives ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;
+  margin-bottom:14px;transition:border-color var(--tr)}
+.card:hover{border-color:var(--line2)}
+.card h2{font-size:11.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--mut);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card h2 .sub{margin-left:auto;font-size:11px;font-weight:600;letter-spacing:.2px;text-transform:none;color:var(--dim)}
+h1.big{font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px}
+.sub2{color:var(--mut);font-size:13.5px;margin-bottom:18px;line-height:1.5}
+.mut{color:var(--mut);font-size:12.5px;line-height:1.55}
+.empty{color:var(--dim);font-size:13px;text-align:center;padding:20px 0}
+.rowflex{display:flex;gap:10px;align-items:center}
+.btn{background:var(--acc);color:#04150d;font-weight:800;border-radius:11px;padding:11px 20px;font-size:14px;
+  width:100%;transition:transform var(--tr),filter var(--tr)}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:scale(.98)}
+.btn2{background:var(--card2);color:var(--txt);font-weight:700;border-radius:11px;padding:10px 15px;
+  font-size:13px;border:1px solid var(--line2);transition:border-color var(--tr),transform var(--tr)}
+.btn2:hover{border-color:var(--acc)}
+.btn2:active{transform:scale(.97)}
+.btn-red{color:var(--red)}
+.btn-red:hover{border-color:var(--red)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:640px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px 16px}
+.tile .v{font-size:24px;font-weight:800;letter-spacing:-.5px}
+.tile .v em{font-style:normal;font-size:13px;color:var(--dim);font-weight:700}
+.tile .l{font-size:10px;color:var(--dim);margin-top:4px;font-weight:800;letter-spacing:1.1px}
+.bar{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc-d),var(--acc));
+  border-radius:99px;transition:width .6s cubic-bezier(.3,.7,.3,1)}
+.chip{display:inline-flex;align-items:center;font-size:10.5px;font-weight:800;letter-spacing:.4px;
+  padding:3px 9px;border-radius:99px;background:var(--card2);border:1px solid var(--line2)}
+.chip.g{color:var(--acc)} .chip.a{color:var(--amb)} .chip.r{color:var(--red)} .chip.b{color:var(--blu)} .chip.v{color:var(--vio)}
+
+/* ---------- habits / checklists ---------- */
+.hab{display:flex;align-items:center;gap:13px;padding:12px 13px;border:1px solid var(--line);
+  border-radius:13px;margin-bottom:8px;background:var(--bg2);cursor:pointer;
+  transition:border-color var(--tr),background var(--tr),transform .12s}
+.hab:active{transform:scale(.985)}
+.hab.done{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.06)}
+.cb{width:23px;height:23px;border-radius:8px;border:2px solid var(--dim);display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;transition:all .18s cubic-bezier(.3,1.4,.5,1)}
+.cb svg{width:13px;height:13px;stroke:#04150d;stroke-width:3.2;fill:none;stroke-linecap:round;
+  stroke-linejoin:round;opacity:0;transform:scale(.4);transition:all .18s cubic-bezier(.3,1.4,.5,1)}
+.done>.cb,.gl.done .cb{background:var(--acc);border-color:var(--acc)}
+.done>.cb svg,.gl.done .cb svg{opacity:1;transform:scale(1)}
+.hab .nm{font-weight:600;font-size:14.5px;line-height:1.4}
+.hab.done .nm{color:var(--acc)}
+.xdel{margin-left:auto;color:var(--dim);font-size:15px;padding:4px 7px;border-radius:8px;transition:color var(--tr)}
+.xdel:hover{color:var(--red)}
+
+/* ---------- countdowns ---------- */
+.cds{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media(max-width:720px){.cds{grid-template-columns:repeat(2,1fr)}.cds .cd:last-child{grid-column:1/-1}}
+.cd{background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:12px;text-align:center}
+.cd .n{font-size:23px;font-weight:800;color:var(--amb);letter-spacing:-.5px}
+.cd.hot .n{color:var(--red)}
+.cd .t{font-size:10px;color:var(--mut);margin-top:3px;font-weight:800;letter-spacing:.8px}
+
+/* ---------- heatmap ---------- */
+.heat{display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;gap:3.5px;overflow-x:auto;padding-bottom:4px}
+.heat i{width:12px;height:12px;border-radius:3.5px;background:var(--bg2);border:1px solid var(--line);flex-shrink:0}
+.heat i.l1{background:#134e34;border-color:#134e34}
+.heat i.l2{background:#15966b;border-color:#15966b}
+.heat i.l3{background:var(--acc);border-color:var(--acc)}
+.heat i.tod{outline:1.5px solid var(--amb);outline-offset:1px}
+
+/* ---------- courses ---------- */
+.grp{margin-bottom:6px}
+.grph{display:flex;align-items:center;gap:10px;margin:16px 0 10px}
+.grph .t{font-size:11px;font-weight:800;letter-spacing:1.3px;color:var(--amb);text-transform:uppercase}
+.grph .ln{flex:1;height:1px;background:var(--line)}
+.grph .c{font-size:11px;color:var(--dim);font-weight:700}
+.crs{border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:9px;background:var(--bg2);
+  transition:border-color var(--tr)}
+.crs.full{border-color:rgba(52,211,153,.3)}
+.crs .top{display:flex;align-items:center;gap:9px;margin-bottom:10px;flex-wrap:wrap}
+.crs .nm{font-weight:700;font-size:14px}
+.crs .st{font-size:10.5px;font-weight:800;letter-spacing:.5px;margin-left:auto}
+.crs .row2{display:flex;align-items:center;gap:11px}
+.crs input[type=range]{flex:1;accent-color:var(--acc);padding:0;border:none;background:transparent;height:24px}
+.crs .pct{width:46px;text-align:right;font-weight:800;font-size:13.5px}
+.crs select{width:74px;padding:6px 8px;font-size:13px}
+
+/* ---------- forms & logs ---------- */
+.frm{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:12px}
+.frm .wide{grid-column:1/-1}
+.log{display:flex;gap:12px;padding:11px 4px;border-bottom:1px solid var(--line);font-size:13.5px;align-items:flex-start}
+.log:last-child{border-bottom:0}
+.log .d{color:var(--dim);min-width:60px;font-weight:700;font-size:11.5px;padding-top:3px;letter-spacing:.3px}
+.log .b{flex:1;min-width:0}
+.log .t1{font-weight:700}
+.log .t2{color:var(--mut);font-size:12.5px;margin-top:3px;line-height:1.5}
+.pill{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.5px;padding:2.5px 9px;border-radius:99px;margin-right:7px}
+.p-bat{background:rgba(52,211,153,.13);color:var(--acc)}
+.p-nets{background:rgba(45,212,191,.13);color:#2dd4bf}
+.p-bowl{background:rgba(125,211,252,.13);color:var(--blu)}
+.p-field{background:rgba(251,191,36,.13);color:var(--amb)}
+.p-fit{background:rgba(248,113,113,.13);color:var(--red)}
+.p-match{background:rgba(196,181,253,.15);color:var(--vio)}
+
+/* ---------- charts ---------- */
+.chart{display:flex;align-items:flex-end;gap:5px;height:120px;padding-top:8px;position:relative}
+.chart .c{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;min-width:0}
+.chart .b{width:100%;max-width:30px;background:linear-gradient(180deg,var(--acc),#0e7f5b);border-radius:6px 6px 3px 3px;
+  min-height:3px;transition:height .5s cubic-bezier(.3,.7,.3,1)}
+.chart .b.blu{background:linear-gradient(180deg,var(--blu),#0369a1)}
+.chart .b.amb{background:linear-gradient(180deg,var(--amb),#b45309)}
+.chart .x{font-size:9px;color:var(--dim);font-weight:700;white-space:nowrap}
+.goalline{position:absolute;left:0;right:0;border-top:2px dashed rgba(251,191,36,.5);z-index:1;pointer-events:none}
+.goalline span{position:absolute;right:0;top:-17px;font-size:9.5px;color:var(--amb);font-weight:800;letter-spacing:.5px}
+
+/* ---------- coach ---------- */
+.coachhead{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(52,211,153,.09),rgba(125,211,252,.05));
+  border:1px solid rgba(52,211,153,.25);border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
+.coachhead .ic{width:42px;height:42px;border-radius:13px;background:rgba(52,211,153,.15);display:flex;
+  align-items:center;justify-content:center;flex-shrink:0}
+.coachhead .ic svg{width:23px;height:23px;stroke:var(--acc);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.coachhead .t1{font-weight:800;font-size:15px}
+.coachhead .t2{color:var(--mut);font-size:12px;margin-top:2px}
+.why{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0}
+.why .wt{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--blu);margin-bottom:6px}
+.why div.wl{font-size:12.5px;color:var(--mut);line-height:1.6;display:flex;gap:8px}
+.why div.wl b{color:var(--txt);font-weight:600}
+.ex{display:flex;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:13.5px}
+.ex:last-child{border-bottom:0}
+.ex .en{font-weight:600}
+.ex .ev{color:var(--amb);font-weight:800;font-size:12.5px;white-space:nowrap}
+.score{display:flex;align-items:center;gap:18px;margin-bottom:14px}
+.ring{position:relative;width:86px;height:86px;flex-shrink:0}
+.ring svg{transform:rotate(-90deg)}
+.ring .rn{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .rv{font-size:23px;font-weight:800;letter-spacing:-.5px}
+.ring .rl{font-size:9px;color:var(--dim);font-weight:800;letter-spacing:1px}
+.comp{display:flex;flex-wrap:wrap;gap:7px}
+.comp .cp{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:5px 11px;
+  border-radius:99px;border:1px solid var(--line2);background:var(--card2);color:var(--dim)}
+.comp .cp.ok{color:var(--acc);border-color:rgba(52,211,153,.35)}
+.tip{display:flex;gap:10px;padding:9px 0;font-size:13px;color:var(--mut);line-height:1.55;border-bottom:1px solid var(--line)}
+.tip:last-child{border-bottom:0}
+.tip .ti{color:var(--amb);font-weight:800;flex-shrink:0}
+.insight{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+.insight:last-child{border-bottom:0}
+.insight .iv{font-size:16px;font-weight:800;min-width:70px;letter-spacing:-.3px}
+.insight .iv.up{color:var(--acc)} .insight .iv.dn{color:var(--red)} .insight .iv.fl{color:var(--amb)}
+.insight .it{font-size:12.5px;color:var(--mut);line-height:1.5;padding-top:2px}
+
+/* ---------- goals ---------- */
+.phh2{font-size:10.5px;font-weight:800;color:var(--amb);letter-spacing:1.4px;text-transform:uppercase;margin:16px 0 9px}
+.gl{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;
+  margin-bottom:7px;background:var(--bg2);cursor:pointer;transition:border-color var(--tr)}
+.gl .cb{width:20px;height:20px;border-radius:7px;margin-top:1px}
+.gl .nm{font-size:13.5px;font-weight:600;line-height:1.5}
+.gl.done .nm{color:var(--dim);text-decoration:line-through}
+
+/* ---------- journal ---------- */
+.jrn{padding:12px 0;border-bottom:1px solid var(--line)}
+.jrn:last-child{border-bottom:0}
+.jrn .d{font-size:11px;color:var(--amb);font-weight:800;letter-spacing:.6px;margin-bottom:5px;display:flex;gap:10px;align-items:center}
+.jrn .sc{color:var(--acc);font-weight:800}
+.jrn .t{font-size:13.5px;color:var(--txt);line-height:1.6;white-space:pre-wrap;word-wrap:break-word}
+
+#toast{position:fixed;left:50%;transform:translateX(-50%) translateY(14px);bottom:98px;background:var(--txt);
+  color:var(--bg);font-weight:800;font-size:13.5px;padding:11px 22px;border-radius:99px;opacity:0;
+  pointer-events:none;transition:all .3s cubic-bezier(.3,.7,.4,1.2);z-index:99;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(min-width:880px){#toast{bottom:32px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Cricket<b>Scholar</b></div>
+  <div class="streak">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M12 2c1 4-4 6-4 11a4 4 0 008 0c0-2-1-3-1-3s3 1 3 4a6 6 0 11-12 0c0-6 5-8 6-12z" fill="#fbbf24" stroke="none"/></svg>
+    <span id="streakN">0</span>&nbsp;day streak
+  </div>
+</header>
+
+<nav id="nav">
+  <button data-p="home" class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button>
+  <button data-p="sat"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg>SAT</button>
+  <button data-p="school"><svg viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19a2 2 0 002 2h13"/><path d="M9 7h6"/></svg>School</button>
+  <button data-p="cricket"><svg viewBox="0 0 24 24"><path d="M4 20l9.5-9.5"/><path d="M12 4.5L19.5 12l-4.7 1.8L11 18.5 8.7 16"/><circle cx="18.5" cy="18.5" r="2.2"/></svg>Cricket</button>
+  <button data-p="coach"><svg viewBox="0 0 24 24"><path d="M12 3a4 4 0 014 4c2 .5 3 2 3 4a4 4 0 01-2 3.5V16a5 5 0 01-10 0v-1.5A4 4 0 015 11c0-2 1-3.5 3-4a4 4 0 014-4z"/><path d="M12 8v8"/><path d="M9.5 11.5h5"/></svg>Coach</button>
+  <button data-p="more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>More</button>
+</nav>
+
+<main>
+
+<!-- ================= HOME ================= -->
+<section class="pg on" id="pg-home">
+  <h1 class="big" id="greet"></h1>
+  <div class="sub2" id="todayDate"></div>
+
+  <div class="tiles">
+    <div class="tile"><div class="v" id="tSat">—</div><div class="l">DAYS TO SAT</div></div>
+    <div class="tile"><div class="v" id="tCourses">0<em>/25</em></div><div class="l">BLOCKS DONE</div></div>
+    <div class="tile"><div class="v" id="tHrsWk">0<em>h</em></div><div class="l">TRAINED THIS WEEK</div></div>
+    <div class="tile"><div class="v" id="tJavg">—</div><div class="l">JOURNAL AVG /10</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Today's non-negotiables <span class="sub" id="habPct">0%</span></h2>
+    <div style="margin-bottom:13px" class="bar"><i id="habBar" style="width:0%"></i></div>
+    <div id="habList"></div>
+    <div class="rowflex" style="margin-top:11px">
+      <input id="habNew" placeholder="Add a daily habit (edit these when you land in India)…">
+      <button class="btn2" onclick="addHabit()">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Countdowns</h2>
+    <div class="cds" id="cds"></div>
+  </div>
+
+  <div class="card">
+    <h2>Consistency <span class="sub">20 weeks · greener = more done</span></h2>
+    <div class="heat" id="heat"></div>
+  </div>
+
+  <div class="card">
+    <h2>Today's journal <span class="sub">Coach grades this — be specific</span></h2>
+    <textarea id="jToday" rows="4" placeholder="What did you train? What did you finish in school? Numbers, drills, honest mood — and one line on what you'll fix tomorrow."></textarea>
+    <div style="margin-top:10px"><button class="btn" onclick="saveJournal()">Save — Coach will review it</button></div>
+  </div>
+</section>
+
+<!-- ================= SAT ================= -->
+<section class="pg" id="pg-sat">
+  <h1 class="big">SAT command center</h1>
+  <div class="sub2">Heads up: UC schools (incl. UCSD) are <b>test-free</b> — this score is for USC, privates & merit scholarships. Still worth the summer.</div>
+
+  <div class="tiles">
+    <div class="tile"><div class="v" id="satDays">—</div><div class="l">DAYS LEFT</div></div>
+    <div class="tile"><div class="v" id="satBest">—</div><div class="l">BEST PRACTICE</div></div>
+    <div class="tile"><div class="v" id="satLast">—</div><div class="l">LATEST</div></div>
+    <div class="tile"><div class="v" id="satGap">—</div><div class="l">GAP TO GOAL</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Setup</h2>
+    <div class="frm">
+      <div><div class="mut" style="margin-bottom:5px">Test date</div><input type="date" id="satDate" onchange="setSat()"></div>
+      <div><div class="mut" style="margin-bottom:5px">Goal score</div><input type="number" id="satGoal" step="10" min="400" max="1600" onchange="setSat()"></div>
+    </div>
+    <p class="mut">Rhythm: 1 full timed practice test every Saturday + daily drills. Log every test below.</p>
+  </div>
+
+  <div class="card">
+    <h2>Practice scores <span class="sub" id="satTrend"></span></h2>
+    <div class="chart" id="satChart" style="height:130px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Log a practice test</h2>
+    <div class="frm">
+      <input type="date" id="ptDate">
+      <input type="number" id="ptRw" placeholder="Reading/Writing" min="100" max="800" step="10">
+      <input type="number" id="ptMath" placeholder="Math" min="100" max="800" step="10">
+      <button class="btn" onclick="addPt()">Log test</button>
+    </div>
+    <div id="ptList"></div>
+  </div>
+</section>
+
+<!-- ================= SCHOOL ================= -->
+<section class="pg" id="pg-school">
+  <h1 class="big">Max-rigor · 25 blocks</h1>
+  <div class="sub2">Summer bank now → 9 APs in the India year · every block must be UC A-G approved</div>
+
+  <div class="tiles">
+    <div class="tile"><div class="v" id="sDone">0<em>/25</em></div><div class="l">COMPLETED</div></div>
+    <div class="tile"><div class="v" id="sAvg">0<em>%</em></div><div class="l">AVG PROGRESS</div></div>
+    <div class="tile"><div class="v" id="sGpa" style="color:var(--amb)">—</div><div class="l">GPA UW · W</div></div>
+    <div class="tile"><div class="v" id="sPace">—</div><div class="l">PACE</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Overall <span class="sub" id="sPctLbl">0%</span></h2>
+    <div class="bar"><i id="sBar" style="width:0%"></i></div>
+  </div>
+
+  <div class="card">
+    <h2>Course blocks</h2>
+    <div id="crsAll"></div>
+    <div class="frm" style="margin-top:14px">
+      <input id="cNew" placeholder="Add course block…" class="wide">
+      <select id="cNewTerm"><option value="SUM">Summer</option><option value="S1">Semester 1</option><option value="S2">Semester 2</option></select>
+      <select id="cNewTag"><option>AP</option><option>HON</option><option>A-G</option><option>REQ</option></select>
+      <button class="btn" onclick="addCourse()">Add</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CRICKET ================= -->
+<section class="pg" id="pg-cricket">
+  <h1 class="big">Training & matches</h1>
+  <div class="sub2">Batter · volume + honest ratings — Coach reads all of this</div>
+
+  <div class="tiles">
+    <div class="tile"><div class="v" id="kHrs">0<em>h</em></div><div class="l">TOTAL HOURS</div></div>
+    <div class="tile"><div class="v" id="kSesWk">0</div><div class="l">SESSIONS THIS WEEK</div></div>
+    <div class="tile"><div class="v" id="kAvg">—</div><div class="l">BATTING AVG</div></div>
+    <div class="tile"><div class="v" id="kSr">—</div><div class="l">STRIKE RATE</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Last 14 days <span class="sub">minutes trained</span></h2>
+    <div class="chart" id="volChart"></div>
+  </div>
+
+  <div class="card">
+    <h2>Log session</h2>
+    <div class="frm">
+      <input type="date" id="lgDate">
+      <select id="lgType"><option>Batting</option><option>Nets</option><option>Bowling</option><option>Fielding</option><option>Fitness</option><option>Match</option></select>
+      <input type="number" id="lgMin" placeholder="Minutes" min="0">
+      <select id="lgRate"><option value="">Rating…</option><option value="5">5 — elite</option><option value="4">4 — good</option><option value="3">3 — okay</option><option value="2">2 — poor</option><option value="1">1 — bad day</option></select>
+      <input id="lgNote" placeholder="What you worked on, what clicked…" class="wide">
+      <button class="btn wide" onclick="addSession()">Log session</button>
+    </div>
+    <div id="sesList"></div>
+  </div>
+
+  <div class="card">
+    <h2>Log innings</h2>
+    <div class="frm">
+      <input type="date" id="mDate">
+      <input id="mOpp" placeholder="Opposition / tournament">
+      <input type="number" id="mRuns" placeholder="Runs" min="0">
+      <input type="number" id="mBalls" placeholder="Balls" min="0">
+      <select id="mOut"><option value="out">Dismissed</option><option value="no">Not out</option></select>
+      <input id="mNote" placeholder="How you got out / key learning…" class="wide">
+      <button class="btn wide" onclick="addMatch()">Log innings</button>
+    </div>
+    <div id="matchList"></div>
+  </div>
+</section>
+
+<!-- ================= COACH ================= -->
+<section class="pg" id="pg-coach">
+  <div class="coachhead">
+    <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3a4 4 0 014 4c2 .5 3 2 3 4a4 4 0 01-2 3.5V16a5 5 0 01-10 0v-1.5A4 4 0 015 11c0-2 1-3.5 3-4a4 4 0 014-4z"/><path d="M12 8v8"/><path d="M9.5 11.5h5"/></svg></div>
+    <div>
+      <div class="t1">Coach — built into this file</div>
+      <div class="t2">Runs 100% on your device · no API keys · no internet needed · reads your logs & journal</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Your plan — tell Coach what you're doing <span class="sub" id="plMeta"></span></h2>
+    <div class="frm">
+      <input type="date" id="plDate" onchange="renderPlan()">
+      <textarea id="plText" rows="3" class="wide" placeholder="Type it like you'd text a coach — e.g. 45 min throwdowns, 200 balls nets, 6x20m sprints, gym upper 40 min, finish AP Micro unit 2"></textarea>
+      <button class="btn wide" onclick="setPlan()">Set plan — Coach tracks it</button>
+    </div>
+    <div id="plList"></div>
+    <p class="mut" style="margin-top:9px">Tick items as you finish them — training items auto-log into your Cricket sessions with their minutes. Come back to "Your week" below to see everything you did.</p>
+  </div>
+
+  <div class="card">
+    <h2>Today's workout <span class="sub" id="woMeta"></span></h2>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+      <span style="font-size:18px;font-weight:800" id="woName"></span>
+      <span class="chip a" id="woLvl"></span>
+      <span class="chip b" id="woDur"></span>
+    </div>
+    <div class="why"><div class="wt">WHY THIS TODAY</div><div id="woWhy"></div></div>
+    <div id="woExs"></div>
+    <div class="rowflex" style="margin-top:13px">
+      <button class="btn" id="woDoneBtn" onclick="woDone()">Done — log it</button>
+      <button class="btn2" onclick="woSwap()">Swap</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Journal review <span class="sub" id="jrDate"></span></h2>
+    <div id="jrBody"></div>
+  </div>
+
+  <div class="card">
+    <h2>Journal quality — day by day <span class="sub">last 14 entries</span></h2>
+    <div class="chart" id="jChart" style="height:110px"></div>
+  </div>
+
+  <div class="card">
+    <h2>This week's insights</h2>
+    <div id="insights"></div>
+  </div>
+
+  <div class="card">
+    <h2>Your week <span class="sub">everything you actually did</span></h2>
+    <div class="rowflex" style="margin-bottom:11px">
+      <button class="btn2" id="wkThis" onclick="setWeekView(0)">This week</button>
+      <button class="btn2" id="wkLast" onclick="setWeekView(1)">Last week</button>
+    </div>
+    <div id="weekReview"></div>
+  </div>
+
+  <div class="card">
+    <h2>Body</h2>
+    <div class="frm">
+      <input type="date" id="wDate">
+      <input type="number" id="wKg" placeholder="Weight (kg)" step="0.1">
+      <button class="btn2" onclick="addWeight()">Log weight</button>
+      <input id="prName" placeholder="PB test (20m sprint, yo-yo…)">
+      <input id="prVal" placeholder="Result">
+      <button class="btn2" onclick="addPr()">Save PB</button>
+    </div>
+    <div id="bodyList"></div>
+  </div>
+</section>
+
+<!-- ================= MORE ================= -->
+<section class="pg" id="pg-more">
+  <h1 class="big">Roadmap, journal & data</h1>
+  <div class="sub2">The long game lives here</div>
+
+  <div class="card">
+    <h2>Roadmap</h2>
+    <div id="goalList"></div>
+    <div class="rowflex" style="margin-top:11px">
+      <input id="gNew" placeholder="Add milestone…">
+      <select id="gNewPh" style="width:150px">
+        <option>Summer · SAT</option><option>Semester 1</option><option>Semester 2</option><option>Cricket Year</option><option>The Dream</option>
+      </select>
+      <button class="btn2" onclick="addGoal()">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Journal history <span class="sub">with Coach scores</span></h2>
+    <div id="jList"></div>
+  </div>
+
+  <div class="card">
+    <h2>Data</h2>
+    <div class="rowflex" style="flex-wrap:wrap;gap:9px">
+      <button class="btn2" onclick="exportData()">Export backup (JSON)</button>
+      <button class="btn2" onclick="document.getElementById('impFile').click()">Import backup</button>
+      <button class="btn2 btn-red" onclick="resetAll()">Reset everything</button>
+      <input type="file" id="impFile" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+    <p class="mut" style="margin-top:10px">Deploy: rename to index.html → drag into app.netlify.com/drop. Data lives in this browser only — export weekly.</p>
+  </div>
+</section>
+
+</main>
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ============================================================
+   STATE
+============================================================ */
+var KEY='akhilTracker_v2';
+var CHECK='<svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></svg>';
+var DEFAULT_HABITS=[
+  {id:'h1',label:'Morning training — nets / skills'},
+  {id:'h2',label:'SAT prep — 2h (swap to School Block 1 in India)'},
+  {id:'h3',label:'Course block — 2h deep work'},
+  {id:'h4',label:'Evening session — skills / gym'},
+  {id:'h5',label:'Journal + Coach check-in (10 min)'}
+];
+var DEFAULT_COURSES=[
+  ['Health','REQ','SUM'],['PE','REQ','SUM'],['Art Appreciation A','A-G','SUM'],
+  ['Art Appreciation B','A-G','SUM'],['Personal Finance','REQ','SUM'],
+  ['AP English Language A','AP','S1'],['AP English Literature A','AP','S1'],
+  ['Precalculus Honors A','HON','S1'],['Precalculus Honors B','HON','S1'],
+  ['AP US History A','AP','S1'],['AP Microeconomics','AP','S1'],
+  ['AP CS Principles A','AP','S1'],['AP Statistics A','AP','S1'],
+  ['Chemistry Honors A','HON','S1'],['Spanish 2 A','A-G','S1'],
+  ['AP English Language B','AP','S2'],['AP English Literature B','AP','S2'],
+  ['AP Calculus AB A','AP','S2'],['AP Calculus AB B','AP','S2'],
+  ['AP US History B','AP','S2'],['AP Macroeconomics','AP','S2'],
+  ['AP CS Principles B','AP','S2'],['AP Statistics B','AP','S2'],
+  ['Chemistry Honors B','HON','S2'],['Spanish 2 B','A-G','S2']
+];
+var DEFAULT_GOALS=[
+  ['Summer · SAT','Enroll SVHS + get 25-block overload approved IN WRITING'],
+  ['Summer · SAT','Start all 5 summer credit blocks'],
+  ['Summer · SAT','4 full timed SAT practice tests logged'],
+  ['Summer · SAT','Hit goal score on a practice test'],
+  ['Summer · SAT','Sit the SAT (September)'],
+  ['Summer · SAT','Email SIX Cricket: boarding, elite program, match play, all-in cost — in writing'],
+  ['Summer · SAT','Flights + visa (OCI/entry) sorted'],
+  ['Semester 1','Land in India, settle in at SIX Cricket (CSE campus), confirm boarding'],
+  ['Semester 1','Finish all 10 S1 blocks by Feb 1'],
+  ['Semester 1','300+ training hours logged'],
+  ['Semester 1','First competitive league match'],
+  ['Semester 1','Register for May 2027 AP exams (India center)'],
+  ['Semester 2','Finish all 10 S2 blocks by Jun 1'],
+  ['Semester 2','Sit 6 AP exams (May 2027)'],
+  ['Semester 2','First 50+ score in a league match'],
+  ['Cricket Year','GRADUATE — Jun 2027, age 16'],
+  ['Cricket Year','USA Cricket U19 trial / combine (summer 2027)'],
+  ['Cricket Year','Full season: 500+ league runs'],
+  ['Cricket Year','Submit UC application — Nov 2027'],
+  ['The Dream','First century'],
+  ['The Dream','MLC academy contract OR UCSD admit — win either way']
+];
+var S=load();
+function load(){
+  try{var raw=localStorage.getItem(KEY);if(raw){var d=JSON.parse(raw);if(d&&d.courses){if(!d.plans)d.plans={};return d;}}}catch(e){}
+  return {
+    habits:DEFAULT_HABITS.slice(),
+    days:{},
+    courses:DEFAULT_COURSES.map(function(c,i){return {id:'c'+i,name:c[0],tag:c[1],term:c[2],pct:0,grade:''};}),
+    sessions:[],matches:[],weights:[],prs:[],plans:{},
+    goals:DEFAULT_GOALS.map(function(g,i){return {id:'g'+i,phase:g[0],name:g[1],done:false};}),
+    sat:{date:'2026-09-12',goal:1450,tests:[]},
+    wo:{doneDate:'',pick:{},counts:{}}
+  };
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){toast('Could not save');}}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');
+  clearTimeout(t._x);t._x=setTimeout(function(){t.classList.remove('show');},1900);}
+
+/* ============================================================
+   HELPERS
+============================================================ */
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function today(){return iso(new Date());}
+function day(k){if(!S.days[k])S.days[k]={h:{},j:''};return S.days[k];}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function fmtD(k){var p=k.split('-');return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1]-1]+' '+(+p[2]);}
+function daysAgoKey(n){return iso(new Date(Date.now()-n*86400000));}
+function dayPct(k){var d=S.days[k];if(!d)return 0;var n=S.habits.length||1,c=0;
+  S.habits.forEach(function(h){if(d.h[h.id])c++;});return c/n;}
+function minutesOn(k){return S.sessions.reduce(function(a,s){return a+(s.date===k?(+s.min||0):0);},0);}
+function weekMinutes(offsetWeeks){
+  var now=new Date(),mon=new Date(now);
+  mon.setDate(now.getDate()-((now.getDay()+6)%7)-(offsetWeeks||0)*7);mon.setHours(0,0,0,0);
+  var end=new Date(mon);end.setDate(mon.getDate()+7);
+  return S.sessions.reduce(function(a,s){var d=new Date(s.date+'T12:00:00');
+    return a+((d>=mon&&d<end)?(+s.min||0):0);},0);
+}
+
+/* ============================================================
+   COACH ENGINE — workouts (no APIs, all local)
+============================================================ */
+var WORKOUTS=[
+ {id:'rot',name:'Rotational Power',pr:1.25,dur:[35,45,55],ex:[
+   ['Med-ball rotational throw (wall)','3×8/side','4×8/side','5×8/side'],
+   ['Med-ball shot-put throw','3×6/side','4×6/side','4×8/side'],
+   ['Box jump (step down)','3×5','4×5','5×5'],
+   ['Standing broad jump','3×4','4×4','5×4'],
+   ['Band/cable woodchop','3×10/side','3×12/side','4×12/side'],
+   ['Pallof press hold','3×20s/side','3×30s/side','4×30s/side']]},
+ {id:'low',name:'Lower Body Strength',pr:1.0,dur:[40,50,60],ex:[
+   ['Goblet / back squat','3×10','4×8','5×5 heavier'],
+   ['Romanian deadlift','3×10','4×8','4×6 heavier'],
+   ['Bulgarian split squat','2×8/leg','3×8/leg','3×10/leg'],
+   ['Nordic curl (eccentric)','2×5','3×5','3×8'],
+   ['Standing calf raise','3×15','3×20','4×20'],
+   ['Glute bridge / hip thrust','3×12','3×15','4×12 weighted']]},
+ {id:'upp',name:'Upper Strength + Forearms',pr:0.9,dur:[35,45,55],ex:[
+   ['Push-ups / DB bench','3×12','4×12','4×8 weighted'],
+   ['One-arm DB row','3×10/side','4×10/side','4×8/side heavier'],
+   ['Pull-ups (band ok)','3×max','4×max','5×max'],
+   ['DB shoulder press','3×10','3×12','4×10'],
+   ['Farmer carry','3×30m','4×30m','4×40m heavier'],
+   ['Wrist roller / rice bucket grip','3×1min','3×90s','4×90s']]},
+ {id:'spd',name:'Speed Between Wickets',pr:1.0,dur:[35,45,50],ex:[
+   ['A-skips + high knees warmup','2×20m','2×20m','3×20m'],
+   ['20m sprint (full)','6 reps','8 reps','10 reps'],
+   ['Wicket-to-wicket run 2s (with bat, turn)','6 reps','8 reps','10 reps'],
+   ['5-10-5 shuttle','4 reps','6 reps','8 reps'],
+   ['Bounding','3×15m','4×15m','4×20m'],
+   ['Dive-and-slide practice (soft ground)','—','4 reps','6 reps']]},
+ {id:'cor',name:'Core & Anti-Rotation',pr:1.1,dur:[30,35,45],ex:[
+   ['Plank','3×40s','3×60s','3×90s'],
+   ['Side plank + reach-through','3×30s/side','3×40s/side','3×60s/side'],
+   ['Dead bug','3×10/side','3×12/side','4×12/side'],
+   ['Hanging knee raise','3×8','3×12','4×12'],
+   ['Bird dog (slow)','3×8/side','3×10/side','3×12/side'],
+   ['Suitcase carry','3×30m/side','3×40m/side','4×40m/side']]},
+ {id:'mob',name:'Mobility & Recovery',pr:0.6,dur:[25,30,35],ex:[
+   ['90/90 hip switches','2×8/side','2×10/side','3×10/side'],
+   ['Couch stretch (hip flexor)','2×45s/side','2×60s/side','2×90s/side'],
+   ['Thoracic open-book rotations','2×10/side','2×12/side','3×10/side'],
+   ['Hamstring flow + toe touches','2×10','2×12','3×10'],
+   ['Shoulder CARs + band dislocates','2×8','2×10','3×10'],
+   ['Slow nasal breathing, legs up wall','5 min','7 min','10 min']]}
+];
+var PAIN_WORDS=['pain','hurt','hurts','sore','injury','injured','niggle','tight','pulled','strain','cramp','ache','aching','swollen'];
+function journalOn(k){var d=S.days[k];return d&&d.j?d.j:'';}
+function painFlag(){
+  var hits=0;
+  for(var i=0;i<3;i++){
+    var t=journalOn(daysAgoKey(i)).toLowerCase();
+    if(PAIN_WORDS.some(function(w){return t.indexOf(w)>=0;}))hits++;
+  }
+  return hits>=2;
+}
+function consecDays(){
+  var c=0;for(var i=1;i<=10;i++){if(minutesOn(daysAgoKey(i))>0)c++;else break;}
+  if(minutesOn(today())>0)c++;
+  return c;
+}
+function loadRatio(){ // acute (7d) vs chronic (28d avg per week)
+  var acute=0,chronic=0,i;
+  for(i=0;i<7;i++)acute+=minutesOn(daysAgoKey(i));
+  for(i=0;i<28;i++)chronic+=minutesOn(daysAgoKey(i));
+  chronic=chronic/4||1;
+  return chronic<30?1:acute/chronic;
+}
+function daysSince(typeId){
+  for(var i=0;i<30;i++){
+    var k=daysAgoKey(i);
+    if(S.sessions.some(function(s){return s.date===k&&s.coach===typeId;}))return i;
+  }
+  return 30;
+}
+function pickWorkout(excludeId){
+  var why=[],pick=null,lvl=1;
+  var pain=painFlag(),cons=consecDays(),lr=loadRatio();
+  if(pain){
+    pick=WORKOUTS[5];
+    why.push(['Injury watch','your journal mentioned pain/soreness on 2+ of the last 3 days — recovery only, and tell the academy physio']);
+  } else if(cons>=5){
+    pick=WORKOUTS[5];
+    why.push(['Load control',cons+' straight training days logged — recovery today protects the streak']);
+  } else if(lr>1.5){
+    pick=WORKOUTS[5];
+    why.push(['Spike detected','this week’s volume is '+Math.round(lr*100)+'% of your monthly norm — pull back one day']);
+  } else {
+    var best=null,bestScore=-1;
+    WORKOUTS.forEach(function(w){
+      if(w.id==='mob')return;
+      if(excludeId&&w.id===excludeId)return;
+      var sc=daysSince(w.id)*w.pr;
+      if(sc>bestScore){bestScore=sc;best=w;}
+    });
+    pick=best||WORKOUTS[0];
+    var ds=daysSince(pick.id);
+    why.push(['Rotation',ds>=30?'you haven’t logged this type yet — time to open the account':'last '+pick.name.toLowerCase()+' day was '+ds+' days ago']);
+    if(pick.id==='rot'||pick.id==='cor')why.push(['Batter bias','rotational power and core drive bat speed — Coach weights these higher for you']);
+    var wk=weekMinutes(0);
+    if(wk>0)why.push(['This week',Math.round(wk/60*10)/10+'h logged so far — keep stacking']);
+  }
+  var done=(S.wo.counts&&S.wo.counts[pick.id])||0;
+  lvl=done>=10?3:done>=4?2:1;
+  // recent low ratings pull intensity down
+  var recent=S.sessions.slice(-5).filter(function(s){return s.rate;});
+  if(recent.length>=3){
+    var avg=recent.reduce(function(a,s){return a+(+s.rate);},0)/recent.length;
+    if(avg<2.6&&lvl>1){lvl--;why.push(['Listening to you','recent session ratings are low — intensity dialed down one level']);}
+  }
+  if(lvl>1)why.push(['Progression','level '+lvl+' unlocked — you’ve completed '+done+' '+pick.name.toLowerCase()+' sessions']);
+  return {w:pick,lvl:lvl,why:why};
+}
+function renderCoachWorkout(){
+  var t=today();
+  if(!S.wo.pick||S.wo.pick.date!==t){
+    var p=pickWorkout(null);
+    S.wo.pick={date:t,id:p.w.id,lvl:p.lvl,why:p.why};save();
+  }
+  var w=WORKOUTS.find(function(x){return x.id===S.wo.pick.id;})||WORKOUTS[0];
+  var lvl=S.wo.pick.lvl||1;
+  document.getElementById('woName').textContent=w.name;
+  document.getElementById('woLvl').textContent='LEVEL '+lvl+'/3';
+  document.getElementById('woDur').textContent='~'+w.dur[lvl-1]+' MIN';
+  document.getElementById('woMeta').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  document.getElementById('woWhy').innerHTML=S.wo.pick.why.map(function(x){
+    return '<div class="wl"><b>'+esc(x[0])+':</b> <span>'+esc(x[1])+'</span></div>';}).join('');
+  document.getElementById('woExs').innerHTML=w.ex.map(function(e){
+    var v=e[lvl]||e[1];
+    return '<div class="ex"><span class="en">'+esc(e[0])+'</span><span class="ev">'+esc(v)+'</span></div>';}).join('');
+  var btn=document.getElementById('woDoneBtn');
+  if(S.wo.doneDate===t){btn.textContent='Logged for today ✓';btn.disabled=true;btn.style.opacity=.55;}
+  else{btn.textContent='Done — log it';btn.disabled=false;btn.style.opacity=1;}
+}
+function woSwap(){
+  var p=pickWorkout(S.wo.pick&&S.wo.pick.id);
+  p.why.unshift(['Swapped','you asked for a different focus today']);
+  S.wo.pick={date:today(),id:p.w.id,lvl:p.lvl,why:p.why};save();renderCoachWorkout();
+}
+function woDone(){
+  var w=WORKOUTS.find(function(x){return x.id===S.wo.pick.id;});if(!w)return;
+  var lvl=S.wo.pick.lvl||1;
+  S.sessions.push({ts:Date.now(),date:today(),type:'Fitness',min:w.dur[lvl-1],rate:'',
+    note:'Coach workout: '+w.name+' (L'+lvl+')',coach:w.id});
+  S.wo.counts=S.wo.counts||{};S.wo.counts[w.id]=(S.wo.counts[w.id]||0)+1;
+  S.wo.doneDate=today();save();
+  renderCoachWorkout();renderCricket();renderHome();renderInsights();
+  toast('Workout logged — nice work');
+}
+
+/* ============================================================
+   COACH ENGINE — your daily plan (type it, Coach tracks it)
+============================================================ */
+var TYPE_LEX=[
+ ['Nets',['nets','net session']],
+ ['Batting',['throwdown','batting','bat swing','shadow bat','knocking','range hit','cover drive','drives','pull shot','cut shot','sweep','defence work','middle practice','bowling machine']],
+ ['Bowling',['bowling','bowl','overs','spell']],
+ ['Fielding',['fielding','catching','catches','slip','ground work','direct hit','throwing']],
+ ['Fitness',['gym','run','running','sprint','lift','weights','squat','deadlift','bench','core','abs','plank','cardio','yoga','stretch','mobility','recovery','swim','cycling','conditioning','s&c','workout','fitness','warmup','warm-up','jog']],
+ ['School',['ap ','school','course','chapter','unit','sat','essay','quiz','study','read','math','homework','lesson','module','flashcards','practice test']]
+];
+function classifyItem(t){
+  var s=' '+t.toLowerCase()+' ';
+  for(var i=0;i<TYPE_LEX.length;i++){
+    for(var j=0;j<TYPE_LEX[i][1].length;j++){
+      if(s.indexOf(TYPE_LEX[i][1][j])>=0)return TYPE_LEX[i][0];
+    }
+  }
+  if(/\d+\s*balls/.test(s))return 'Batting';
+  return 'Other';
+}
+function parseMinutes(t){
+  var s=t.toLowerCase().replace(/\d+\s*x\s*\d+\s*m\b/g,'').replace(/\d+\s*(?:meters|meter|km)\b/g,'');
+  var h=s.match(/(\d+(?:\.\d+)?)\s*(?:hours|hour|hrs|hr|h\b)/);
+  if(h)return Math.round(parseFloat(h[1])*60);
+  var m=s.match(/(\d+)\s*(?:minutes|mins|min|m\b)/);
+  if(m)return +m[1];
+  return 0;
+}
+var PHYSICAL=['Batting','Nets','Bowling','Fielding','Fitness','Match'];
+function parsePlan(text){
+  return text.split(/[,\n;•]+/).map(function(x){return x.trim();}).filter(Boolean).map(function(x,i){
+    var type=classifyItem(x),min=parseMinutes(x),assumed=false;
+    if(!min&&PHYSICAL.indexOf(type)>=0){min=30;assumed=true;}
+    return {id:'p'+Date.now()+'_'+i,text:x,type:type,min:min,assumed:assumed,done:false,ts:0};
+  });
+}
+function setPlan(){
+  var dt=document.getElementById('plDate').value||today();
+  var txt=document.getElementById('plText').value.trim();
+  if(!txt){toast('Type your plan first');return;}
+  var old=S.plans[dt];
+  if(old)old.items.forEach(function(it){if(it.ts)S.sessions=S.sessions.filter(function(s){return s.ts!==it.ts;});});
+  S.plans[dt]={raw:txt,items:parsePlan(txt)};
+  document.getElementById('plText').value='';
+  save();renderPlan();renderWeekReview();renderCricket();renderInsights();
+  toast('Plan set — '+S.plans[dt].items.length+' items tracked');
+}
+function planPill(t){return PILL[t]||(t==='School'?'p-bowl':'p-field');}
+function renderPlan(){
+  var el=document.getElementById('plList'),dEl=document.getElementById('plDate');
+  if(!dEl.value)dEl.value=today();
+  var dt=dEl.value,plan=S.plans[dt];
+  document.getElementById('plMeta').textContent=(dt===today()?'today':fmtD(dt));
+  if(!plan||!plan.items.length){el.innerHTML='<div class="empty">No plan for this day yet — type one above (plan tomorrow the night before)</div>';return;}
+  var done=plan.items.filter(function(i){return i.done;}).length;
+  var html='<div class="bar" style="margin:2px 0 11px"><i style="width:'+Math.round(done/plan.items.length*100)+'%"></i></div>';
+  plan.items.forEach(function(it){
+    html+='<div class="hab'+(it.done?' done':'')+'" onclick="togPlanItem(\''+dt+'\',\''+it.id+'\')">'+
+      '<div class="cb">'+CHECK+'</div><div class="nm"><span class="pill '+planPill(it.type)+'">'+it.type.toUpperCase()+'</span>'+esc(it.text)+
+      (it.min?' <span style="color:var(--dim);font-size:11px;font-weight:600">· '+it.min+' min'+(it.assumed?' (assumed)':'')+'</span>':'')+'</div>'+
+      '<button class="xdel" onclick="event.stopPropagation();delPlanItem(\''+dt+'\',\''+it.id+'\')">✕</button></div>';
+  });
+  el.innerHTML=html;
+}
+function togPlanItem(dt,id){
+  var plan=S.plans[dt];if(!plan)return;
+  var it=plan.items.find(function(x){return x.id===id;});if(!it)return;
+  it.done=!it.done;
+  if(it.done&&PHYSICAL.indexOf(it.type)>=0){
+    it.ts=Date.now();
+    S.sessions.push({ts:it.ts,date:dt,type:it.type,min:it.min||30,rate:'',note:'Plan: '+it.text,plan:true});
+    toast('Logged '+(it.min||30)+' min '+it.type+' ✓');
+  } else if(!it.done&&it.ts){
+    S.sessions=S.sessions.filter(function(s){return s.ts!==it.ts;});it.ts=0;
+  } else if(it.done){toast('Done ✓');}
+  save();renderPlan();renderCricket();renderHome();renderInsights();renderWeekReview();
+}
+function delPlanItem(dt,id){
+  var plan=S.plans[dt];if(!plan)return;
+  var it=plan.items.find(function(x){return x.id===id;});
+  if(it&&it.ts)S.sessions=S.sessions.filter(function(s){return s.ts!==it.ts;});
+  plan.items=plan.items.filter(function(x){return x.id!==id;});
+  if(!plan.items.length)delete S.plans[dt];
+  save();renderPlan();renderWeekReview();renderCricket();
+}
+var weekView=0;
+function setWeekView(n){weekView=n;renderWeekReview();}
+function weekPlanTotals(offset){
+  var now=new Date(),mon=new Date(now);
+  mon.setDate(now.getDate()-((now.getDay()+6)%7)-offset*7);mon.setHours(0,0,0,0);
+  var tp=0,td=0;
+  for(var i=0;i<7;i++){
+    var dd=new Date(mon);dd.setDate(mon.getDate()+i);
+    var p=S.plans[iso(dd)];
+    if(p){tp+=p.items.length;td+=p.items.filter(function(x){return x.done;}).length;}
+  }
+  return {tp:tp,td:td};
+}
+function renderWeekReview(){
+  var el=document.getElementById('weekReview');if(!el)return;
+  document.getElementById('wkThis').style.borderColor=weekView===0?'var(--acc)':'var(--line2)';
+  document.getElementById('wkLast').style.borderColor=weekView===1?'var(--acc)':'var(--line2)';
+  var now=new Date(),mon=new Date(now);
+  mon.setDate(now.getDate()-((now.getDay()+6)%7)-weekView*7);mon.setHours(0,0,0,0);
+  var names=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var html='',tp=0,td=0,tm=0;
+  for(var i=0;i<7;i++){
+    var dd=new Date(mon);dd.setDate(mon.getDate()+i);
+    var k=iso(dd),future=dd>now;
+    var plan=S.plans[k],mins=minutesOn(k);
+    var planned=plan?plan.items.length:0;
+    var done=plan?plan.items.filter(function(x){return x.done;}).length:0;
+    if(!future){tp+=planned;td+=done;tm+=mins;}
+    var doneTxt=plan?plan.items.filter(function(x){return x.done;}).map(function(x){return x.text;}).join(' · '):'';
+    html+='<div class="log"'+(future?' style="opacity:.35"':'')+'><div class="d">'+names[i]+' '+(dd.getMonth()+1)+'/'+dd.getDate()+'</div>'+
+      '<div class="b"><div class="t1">'+(future?'upcoming':(planned?done+'/'+planned+' plan items':'no plan'))+
+      (mins&&!future?' · '+Math.round(mins/6)/10+'h trained':'')+'</div>'+
+      (doneTxt&&!future?'<div class="t2">'+esc(doneTxt.length>150?doneTxt.slice(0,150)+'…':doneTxt)+'</div>':'')+'</div></div>';
+  }
+  html+='<div class="log" style="border-top:1px solid var(--line2)"><div class="d" style="color:var(--amb)">TOTAL</div>'+
+    '<div class="b"><div class="t1">'+(tp?Math.round(td/tp*100)+'% of plan done ('+td+'/'+tp+' items)':'no plan items yet')+
+    ' · '+Math.round(tm/6)/10+'h trained</div></div></div>';
+  el.innerHTML=html;
+}
+
+/* ============================================================
+   COACH ENGINE — journal grading (no APIs, all local)
+============================================================ */
+var LEX={
+  cricket:['bat','batting','nets','net','drive','pull','cut','sweep','defence','defense','footwork','throwdowns','bowling','bowled','fielding','catch','catches','wicket','runs','innings','match','coach','drill','drills','stance','trigger','backlift','timing','middled','shot','shots'],
+  school:['school','course','ap','chapter','unit','quiz','test','exam','essay','math','calc','calculus','history','english','chem','chemistry','spanish','stats','econ','economics','sat','reading','lesson','module','assignment','homework'],
+  body:['gym','workout','sleep','slept','stretch','stretching','run','running','sprint','weights','sore','recovery','food','ate','nutrition','protein','water','tired','energy','mobility'],
+  pos:['good','great','confident','proud','improved','improving','better','strong','focused','happy','clean','crisp','solid','learned','progress','won','best','sharp','locked'],
+  neg:['lazy','wasted','distracted','terrible','awful','angry','frustrated','bored','unmotivated','skipped','procrastinated','bad','worst','cant','failed'],
+  refl:['tomorrow','next time','need to','will work','plan to','going to fix','fix','improve','focus on','goal is','must','should']
+};
+function countHits(text,list){var c=0;list.forEach(function(w){if(text.indexOf(w)>=0)c++;});return c;}
+function gradeEntry(text){
+  var t=(text||'').toLowerCase();
+  var words=t.split(/\s+/).filter(Boolean).length;
+  var numbers=(t.match(/\d+/g)||[]).length;
+  var r={score:0,comps:{},tips:[],flag:false};
+  if(!words){r.tips.push('No entry yet — two honest sentences beat zero perfect ones.');return r;}
+  // Effort (0-2)
+  var effort=words>=60?2:words>=30?1.5:words>=15?1:0.5;
+  // Detail (0-2): numbers + concrete drill/school words
+  var detail_hits=numbers+countHits(t,['reps','sets','laps','balls','overs','minutes','min','hours','chapter','unit','score','drill']);
+  var detail=detail_hits>=3?2:detail_hits===2?1.5:detail_hits===1?1:0;
+  // Balance (0-2): cricket + school + body coverage
+  var cov=(countHits(t,LEX.cricket)?1:0)+(countHits(t,LEX.school)?1:0)+(countHits(t,LEX.body)?1:0);
+  var balance=cov===3?2:cov===2?1.3:cov===1?0.6:0;
+  // Reflection (0-2)
+  var rf=countHits(t,LEX.refl);
+  var reflection=rf>=2?2:rf===1?1.2:0;
+  // Mindset (0-2)
+  var net=countHits(t,LEX.pos)-countHits(t,LEX.neg);
+  var mindset=net>=2?2:net===1?1.5:net===0?1:net===-1?0.7:0.4;
+  r.comps={Effort:effort>=1.5,Detail:detail>=1.5,Balance:balance>=1.3,Reflection:reflection>=1.2,Mindset:mindset>=1.5};
+  r.raw={Effort:effort,Detail:detail,Balance:balance,Reflection:reflection,Mindset:mindset};
+  r.score=Math.round((effort+detail+balance+reflection+mindset)*10)/10;
+  // Tips — most impactful gaps first
+  if(reflection<1.2)r.tips.push('Add one line: "Tomorrow I will ___." Improvement intent is the single biggest predictor of actual improvement.');
+  if(detail<1.5)r.tips.push('Be specific — numbers stick: "45 min throwdowns, 120 balls, middled the last 30" beats "batted well".');
+  if(balance<1.3){
+    if(!countHits(t,LEX.school))r.tips.push('No school mention today — did the course blocks happen? Log them even when they’re boring.');
+    else if(!countHits(t,LEX.cricket))r.tips.push('Nothing on cricket today — even rest days deserve one line on the game.');
+    else r.tips.push('Mention your body too — sleep, food, soreness. Coach uses it to set your workouts.');
+  }
+  if(effort<1.5&&r.tips.length<3)r.tips.push('A bit thin — aim for 4-5 sentences. Future-you re-reads these before matches.');
+  if(mindset<=0.7&&r.tips.length<3)r.tips.push('Rough day is fine — write one thing that still went right so the entry doesn’t end in the hole.');
+  if(!r.tips.length)r.tips.push('Elite entry. Keep this exact standard tomorrow.');
+  r.flag=PAIN_WORDS.some(function(w){return t.indexOf(w)>=0;});
+  return r;
+}
+function letterFor(s){return s>=9?'A+':s>=8?'A':s>=7?'B+':s>=6?'B':s>=5?'C+':s>=4?'C':'—';}
+function latestEntryKey(){
+  var keys=Object.keys(S.days).filter(function(k){return S.days[k].j;}).sort();
+  return keys.length?keys[keys.length-1]:null;
+}
+function renderJournalReview(){
+  var k=latestEntryKey(),el=document.getElementById('jrBody');
+  document.getElementById('jrDate').textContent=k?fmtD(k)+(k===today()?' · today':''):'';
+  if(!k){el.innerHTML='<div class="empty">Write today’s journal on Home — Coach grades it instantly.</div>';return;}
+  var g=gradeEntry(S.days[k].j);
+  var pct=g.score*10,circ=2*Math.PI*36;
+  var html='<div class="score">'+
+    '<div class="ring"><svg width="86" height="86"><circle cx="43" cy="43" r="36" stroke="#1f242e" stroke-width="7" fill="none"/>'+
+    '<circle cx="43" cy="43" r="36" stroke="'+(g.score>=7?'#34d399':g.score>=5?'#fbbf24':'#f87171')+'" stroke-width="7" fill="none" stroke-linecap="round" '+
+    'stroke-dasharray="'+circ+'" stroke-dashoffset="'+(circ*(1-pct/100))+'"/></svg>'+
+    '<div class="rn"><div class="rv">'+g.score+'</div><div class="rl">'+letterFor(g.score)+' / 10</div></div></div>'+
+    '<div class="comp">'+Object.keys(g.comps).map(function(c){
+      return '<span class="cp'+(g.comps[c]?' ok':'')+'">'+(g.comps[c]?'✓':'○')+' '+c+'</span>';}).join('')+'</div></div>';
+  if(g.flag)html+='<div class="why" style="border-color:rgba(248,113,113,.4)"><div class="wt" style="color:var(--red)">INJURY WATCH</div><div class="wl"><span>Pain words in this entry. If it shows up again tomorrow, Coach will force recovery days — and tell the physio before it becomes a layoff.</span></div></div>';
+  html+='<div style="margin-top:6px">'+g.tips.map(function(t){return '<div class="tip"><span class="ti">→</span><span>'+esc(t)+'</span></div>';}).join('')+'</div>';
+  el.innerHTML=html;
+}
+function renderJChart(){
+  var el=document.getElementById('jChart');
+  var keys=Object.keys(S.days).filter(function(k){return S.days[k].j;}).sort().slice(-14);
+  if(!keys.length){el.innerHTML='<div class="empty" style="width:100%">Your day-by-day journal scores will chart here</div>';return;}
+  var html='';
+  keys.forEach(function(k){
+    var s=gradeEntry(S.days[k].j).score,h=Math.max(4,Math.round(s/10*86));
+    var cls=s>=7?'':s>=5?' amb':' blu';
+    html+='<div class="c"><div class="b'+cls+'" style="height:'+h+'px" title="'+k+': '+s+'/10"></div><div class="x">'+k.slice(5).replace('-','/')+'</div></div>';
+  });
+  el.innerHTML=html;
+}
+function journalAvg(daysBack,offset){
+  var tot=0,n=0;
+  for(var i=(offset||0);i<(offset||0)+daysBack;i++){
+    var j=journalOn(daysAgoKey(i));
+    if(j){tot+=gradeEntry(j).score;n++;}
+  }
+  return n?Math.round(tot/n*10)/10:null;
+}
+function renderInsights(){
+  var el=document.getElementById('insights'),rows=[];
+  var thisW=weekMinutes(0),lastW=weekMinutes(1);
+  if(lastW>0){
+    var d=Math.round((thisW-lastW)/lastW*100);
+    rows.push([(d>=0?'+':'')+d+'%',d>=0?'up':'dn','Training volume vs last week ('+Math.round(thisW/60*10)/10+'h vs '+Math.round(lastW/60*10)/10+'h)']);
+  } else rows.push([Math.round(thisW/60*10)/10+'h','fl','Training volume this week — first week on record, this is the baseline']);
+  var ja=journalAvg(7,0),jb=journalAvg(7,7);
+  if(ja!=null&&jb!=null)rows.push([(ja>=jb?'+':'')+Math.round((ja-jb)*10)/10,ja>=jb?'up':'dn','Journal quality: '+jb+' → '+ja+' avg /10 — '+(ja>=jb?'you’re reflecting better':'entries getting thinner, tighten up')]);
+  else if(ja!=null)rows.push([ja+'/10','fl','Journal quality this week — beat it next week']);
+  // most skipped habit last 7 days
+  if(S.habits.length){
+    var worst=null,worstN=99;
+    S.habits.forEach(function(h){
+      var n=0;for(var i=0;i<7;i++){var dd=S.days[daysAgoKey(i)];if(dd&&dd.h[h.id])n++;}
+      if(n<worstN){worstN=n;worst=h;}
+    });
+    if(worst&&worstN<7)rows.push([worstN+'/7','fl','Most skipped: "'+worst.label.split('—')[0].trim()+'" — protect it with a fixed time slot']);
+  }
+  // component focus
+  var compTot={},compN=0;
+  for(var i=0;i<7;i++){
+    var j=journalOn(daysAgoKey(i));
+    if(j){var g=gradeEntry(j);Object.keys(g.raw||{}).forEach(function(c){compTot[c]=(compTot[c]||0)+g.raw[c];});compN++;}
+  }
+  if(compN){
+    var low=null,lowV=99;
+    Object.keys(compTot).forEach(function(c){var v=compTot[c]/compN;if(v<lowV){lowV=v;low=c;}});
+    if(low)rows.push(['Focus','fl','Weakest journal muscle: <b>'+low+'</b> — Coach’s tips will keep targeting it']);
+  }
+  var wt=weekPlanTotals(0);
+  if(wt.tp>0){
+    var wp=Math.round(wt.td/wt.tp*100);
+    rows.push([wp+'%',wp>=70?'up':wp>=40?'fl':'dn','Plan completion this week — '+wt.td+'/'+wt.tp+' items you told Coach'+(wp<40?' — set smaller plans you can actually finish':'')]);
+  }
+  if(painFlag())rows.push(['⚠','dn','Pain mentioned repeatedly — workouts locked to recovery until it clears from your journal']);
+  el.innerHTML=rows.length?rows.map(function(r){
+    return '<div class="insight"><div class="iv '+r[1]+'">'+r[0]+'</div><div class="it">'+r[2]+'</div></div>';}).join('')
+    :'<div class="empty">Log a few days and Coach starts spotting patterns</div>';
+}
+
+/* ============================================================
+   HOME
+============================================================ */
+function renderHome(){
+  var now=new Date();
+  document.getElementById('todayDate').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  var h=now.getHours();
+  document.getElementById('greet').textContent=h<12?'Morning session first, Akhil.':h<17?'Keep stacking, Akhil.':'Close the day properly, Akhil.';
+  var d=day(today()),html='';
+  S.habits.forEach(function(hb){
+    var on=!!d.h[hb.id];
+    html+='<div class="hab'+(on?' done':'')+'" onclick="togHab(\''+hb.id+'\')">'+
+      '<div class="cb">'+CHECK+'</div><div class="nm">'+esc(hb.label)+'</div>'+
+      '<button class="xdel" onclick="event.stopPropagation();delHabit(\''+hb.id+'\')">✕</button></div>';
+  });
+  document.getElementById('habList').innerHTML=html||'<div class="empty">Add your first habit</div>';
+  var pct=Math.round(dayPct(today())*100);
+  document.getElementById('habPct').textContent=pct+'%';
+  document.getElementById('habBar').style.width=pct+'%';
+  // countdowns
+  var targets=[['SAT',S.sat.date],['Fly to India','2026-09-30'],['AP Exams','2027-05-03'],['Graduation','2027-06-15'],['UC App','2027-11-30']];
+  document.getElementById('cds').innerHTML=targets.map(function(t){
+    var diff=Math.ceil((new Date(t[1]+'T00:00:00')-now)/86400000);
+    return '<div class="cd'+(diff<=30&&diff>0?' hot':'')+'"><div class="n">'+(diff>0?diff:'✓')+'</div><div class="t">'+(diff>0?'DAYS · ':'')+t[0].toUpperCase()+'</div></div>';
+  }).join('');
+  // tiles
+  var satDiff=Math.ceil((new Date(S.sat.date+'T00:00:00')-now)/86400000);
+  document.getElementById('tSat').textContent=satDiff>0?satDiff:'✓';
+  var done=S.courses.filter(function(c){return c.pct>=100;}).length;
+  document.getElementById('tCourses').innerHTML=done+'<em>/'+S.courses.length+'</em>';
+  document.getElementById('tHrsWk').innerHTML=(Math.round(weekMinutes(0)/6)/10)+'<em>h</em>';
+  var ja=journalAvg(7,0);
+  document.getElementById('tJavg').textContent=ja!=null?ja:'—';
+  var st=streaks();
+  document.getElementById('streakN').textContent=st.cur;
+  document.getElementById('jToday').value=d.j||'';
+  renderHeat();
+}
+function togHab(id){var d=day(today());d.h[id]=!d.h[id];save();renderHome();}
+function addHabit(){var v=document.getElementById('habNew').value.trim();if(!v)return;
+  S.habits.push({id:'h'+Date.now(),label:v});document.getElementById('habNew').value='';save();renderHome();toast('Habit added');}
+function delHabit(id){if(!confirm('Remove this habit?'))return;
+  S.habits=S.habits.filter(function(h){return h.id!==id;});save();renderHome();}
+function streaks(){
+  var cur=0,best=0,run=0;
+  var t=new Date();
+  if(dayPct(iso(t))>=1)cur=1;
+  var tt=new Date();tt.setDate(tt.getDate()-1);
+  while(dayPct(iso(tt))>=1){cur++;tt.setDate(tt.getDate()-1);}
+  for(var i=400;i>=0;i--){
+    if(dayPct(daysAgoKey(i))>=1){run++;if(run>best)best=run;}else run=0;
+  }
+  if(cur>best)best=cur;
+  return {cur:cur,best:best};
+}
+function renderHeat(){
+  var el=document.getElementById('heat'),html='',now=new Date();
+  var start=new Date(now);start.setDate(start.getDate()-139);
+  start.setDate(start.getDate()-start.getDay());
+  for(var i=0;i<140;i++){
+    var dd=new Date(start);dd.setDate(start.getDate()+i);
+    if(dd>now){html+='<i style="visibility:hidden"></i>';continue;}
+    var k=iso(dd),p=dayPct(k),cls=p>=1?'l3':p>=0.6?'l2':p>0?'l1':'';
+    if(k===today())cls+=' tod';
+    html+='<i class="'+cls+'" title="'+k+' · '+Math.round(p*100)+'%"></i>';
+  }
+  el.innerHTML=html;
+}
+function saveJournal(){
+  var d=day(today());d.j=document.getElementById('jToday').value.trim();save();
+  var g=gradeEntry(d.j);
+  toast(d.j?('Coach score: '+g.score+'/10 — see Coach tab'):'Saved');
+  renderJournalReview();renderJChart();renderInsights();renderMore();renderHome();
+}
+
+/* ============================================================
+   SAT
+============================================================ */
+function setSat(){
+  S.sat.date=document.getElementById('satDate').value||S.sat.date;
+  S.sat.goal=+document.getElementById('satGoal').value||S.sat.goal;
+  save();renderSat();renderHome();
+}
+function renderSat(){
+  document.getElementById('satDate').value=S.sat.date;
+  document.getElementById('satGoal').value=S.sat.goal;
+  var diff=Math.ceil((new Date(S.sat.date+'T00:00:00')-new Date())/86400000);
+  document.getElementById('satDays').textContent=diff>0?diff:'✓';
+  var ts=S.sat.tests.slice().sort(function(a,b){return a.date<b.date?-1:1;});
+  var best=ts.length?Math.max.apply(null,ts.map(function(t){return t.rw+t.math;})):null;
+  var last=ts.length?ts[ts.length-1].rw+ts[ts.length-1].math:null;
+  document.getElementById('satBest').textContent=best||'—';
+  document.getElementById('satLast').textContent=last||'—';
+  document.getElementById('satGap').textContent=best?((best>=S.sat.goal?'+':'')+(best-S.sat.goal)):'—';
+  document.getElementById('satGap').style.color=best&&best>=S.sat.goal?'var(--acc)':'';
+  // trend label
+  var tr='';
+  if(ts.length>=2){
+    var d2=(ts[ts.length-1].rw+ts[ts.length-1].math)-(ts[ts.length-2].rw+ts[ts.length-2].math);
+    tr=(d2>=0?'+':'')+d2+' vs previous test';
+  }
+  document.getElementById('satTrend').textContent=tr;
+  // chart
+  var el=document.getElementById('satChart'),html='';
+  var view=ts.slice(-10);
+  if(view.length){
+    var goalPct=(S.sat.goal-400)/1200;
+    html+='<div class="goalline" style="bottom:'+Math.round(goalPct*96)+'px"><span>GOAL '+S.sat.goal+'</span></div>';
+    view.forEach(function(t){
+      var tot=t.rw+t.math,hp=Math.max(6,Math.round((tot-400)/1200*96));
+      html+='<div class="c"><div class="b'+(tot>=S.sat.goal?'':' blu')+'" style="height:'+hp+'px" title="'+t.date+': '+tot+' (RW '+t.rw+' / M '+t.math+')"></div><div class="x">'+tot+'</div></div>';
+    });
+    el.innerHTML=html;
+  } else el.innerHTML='<div class="empty" style="width:100%">Log your first practice test — Saturday morning, full timed</div>';
+  // list
+  var lh='';
+  ts.slice(-8).reverse().forEach(function(t){
+    lh+='<div class="log"><div class="d">'+fmtD(t.date)+'</div><div class="b"><div class="t1">'+(t.rw+t.math)+
+      ' <span class="t2" style="display:inline">· RW '+t.rw+' / Math '+t.math+'</span></div></div>'+
+      '<button class="xdel" onclick="delPt('+t.ts+')">✕</button></div>';
+  });
+  document.getElementById('ptList').innerHTML=lh;
+}
+function addPt(){
+  var d=document.getElementById('ptDate').value,rw=+document.getElementById('ptRw').value,m=+document.getElementById('ptMath').value;
+  if(!d||!rw||!m){toast('Date + both scores needed');return;}
+  S.sat.tests.push({ts:Date.now(),date:d,rw:rw,math:m});save();renderSat();renderHome();
+  toast('Logged: '+(rw+m));
+}
+function delPt(ts){S.sat.tests=S.sat.tests.filter(function(t){return t.ts!==ts;});save();renderSat();}
+
+/* ============================================================
+   SCHOOL
+============================================================ */
+var TERMS=[['SUM','Summer bank · finish by Sep 30','2026-07-06','2026-09-30'],
+           ['S1','Semester 1 · Oct → Feb 1','2026-10-01','2027-02-01'],
+           ['S2','Semester 2 · Feb → Jun 1','2027-02-01','2027-06-01']];
+function renderSchool(){
+  var el=document.getElementById('crsAll'),html='';
+  TERMS.forEach(function(t){
+    var list=S.courses.filter(function(c){return c.term===t[0];});
+    if(!list.length)return;
+    var dn=list.filter(function(c){return c.pct>=100;}).length;
+    html+='<div class="grp"><div class="grph"><span class="t">'+t[1]+'</span><span class="ln"></span><span class="c">'+dn+'/'+list.length+'</span></div>';
+    list.forEach(function(c){
+      var st=c.pct>=100?['DONE','var(--acc)']:c.pct>0?['IN PROGRESS','var(--amb)']:['NOT STARTED','var(--dim)'];
+      var tagCls=c.tag==='AP'?'a':c.tag==='HON'?'v':c.tag==='REQ'?'b':'g';
+      html+='<div class="crs'+(c.pct>=100?' full':'')+'"><div class="top">'+
+        '<span class="nm">'+esc(c.name)+'</span><span class="chip '+tagCls+'">'+esc(c.tag)+'</span>'+
+        '<span class="st" style="color:'+st[1]+'">'+st[0]+'</span>'+
+        '<button class="xdel" onclick="delCourse(\''+c.id+'\')">✕</button></div>'+
+        '<div class="row2"><input type="range" min="0" max="100" step="5" value="'+c.pct+'" oninput="setPct(\''+c.id+'\',this.value)">'+
+        '<span class="pct">'+c.pct+'%</span><select onchange="setGrade(\''+c.id+'\',this.value)">'+gradeOpts(c.grade)+'</select></div></div>';
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+  var n=S.courses.length||1;
+  var done=S.courses.filter(function(c){return c.pct>=100;}).length;
+  var avg=Math.round(S.courses.reduce(function(a,c){return a+(+c.pct||0);},0)/n);
+  document.getElementById('sDone').innerHTML=done+'<em>/'+n+'</em>';
+  document.getElementById('sAvg').innerHTML=avg+'<em>%</em>';
+  document.getElementById('sPctLbl').textContent=avg+'%';
+  document.getElementById('sBar').style.width=avg+'%';
+  // GPA unweighted · weighted
+  var pts={'A':4,'A-':3.7,'B+':3.3,'B':3,'B-':2.7,'C+':2.3,'C':2,'D':1,'F':0},tu=0,tw=0,cnt=0;
+  S.courses.forEach(function(c){
+    if(c.grade&&pts[c.grade]!=null){
+      tu+=pts[c.grade];
+      tw+=pts[c.grade]+(c.tag==='AP'?1:c.tag==='HON'?0.5:0);
+      cnt++;
+    }});
+  document.getElementById('sGpa').textContent=cnt?((tu/cnt).toFixed(2)+' · '+(tw/cnt).toFixed(2)):'—';
+  // pace: expected = avg of per-block expected by its term window
+  var now=new Date(),expTot=0;
+  S.courses.forEach(function(c){
+    var t=TERMS.find(function(x){return x[0]===c.term;})||TERMS[0];
+    var a=new Date(t[2]),b=new Date(t[3]);
+    expTot+=Math.max(0,Math.min(1,(now-a)/(b-a)))*100;
+  });
+  var exp=expTot/n,diff=avg-exp,pe=document.getElementById('sPace');
+  if(diff>=0){pe.textContent='+'+Math.round(diff)+'%';pe.style.color='var(--acc)';}
+  else{pe.textContent=Math.round(diff)+'%';pe.style.color='var(--red)';}
+}
+function gradeOpts(g){
+  var out='<option value="">Grade</option>';
+  ['A','A-','B+','B','B-','C+','C','D','F'].forEach(function(x){out+='<option'+(g===x?' selected':'')+'>'+x+'</option>';});
+  return out;
+}
+function setPct(id,v){var c=S.courses.find(function(x){return x.id===id;});if(c){c.pct=+v;save();renderSchool();renderHome();}}
+function setGrade(id,v){var c=S.courses.find(function(x){return x.id===id;});if(c){c.grade=v;save();renderSchool();}}
+function addCourse(){
+  var nm=document.getElementById('cNew').value.trim();if(!nm)return;
+  S.courses.push({id:'c'+Date.now(),name:nm,tag:document.getElementById('cNewTag').value,
+    term:document.getElementById('cNewTerm').value,pct:0,grade:''});
+  document.getElementById('cNew').value='';save();renderSchool();renderHome();toast('Block added');
+}
+function delCourse(id){if(!confirm('Delete this block?'))return;
+  S.courses=S.courses.filter(function(c){return c.id!==id;});save();renderSchool();renderHome();}
+
+/* ============================================================
+   CRICKET
+============================================================ */
+var PILL={'Batting':'p-bat','Nets':'p-nets','Bowling':'p-bowl','Fielding':'p-field','Fitness':'p-fit','Match':'p-match'};
+function renderCricket(){
+  document.getElementById('lgDate').value=document.getElementById('lgDate').value||today();
+  document.getElementById('mDate').value=document.getElementById('mDate').value||today();
+  var totMin=S.sessions.reduce(function(a,s){return a+(+s.min||0);},0);
+  document.getElementById('kHrs').innerHTML=Math.round(totMin/60)+'<em>h</em>';
+  var now=new Date(),mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));mon.setHours(0,0,0,0);
+  document.getElementById('kSesWk').textContent=S.sessions.filter(function(s){return new Date(s.date+'T12:00:00')>=mon;}).length;
+  var runs=0,balls=0,outs=0;
+  S.matches.forEach(function(m){runs+=(+m.runs||0);balls+=(+m.balls||0);if(m.out==='out')outs++;});
+  document.getElementById('kAvg').textContent=outs?(Math.round(runs/outs*10)/10):(S.matches.length?runs+'*':'—');
+  document.getElementById('kSr').textContent=balls?Math.round(runs/balls*1000)/10:'—';
+  // volume chart
+  var el=document.getElementById('volChart'),html='',max=1,vals=[];
+  for(var i=13;i>=0;i--){var k=daysAgoKey(i),m2=minutesOn(k);vals.push([k,m2]);if(m2>max)max=m2;}
+  vals.forEach(function(v){
+    var hp=Math.round(v[1]/max*92);
+    html+='<div class="c"><div class="b" style="height:'+(v[1]?Math.max(hp,5):3)+'px" title="'+v[0]+': '+v[1]+' min"></div><div class="x">'+(+v[0].slice(8))+'</div></div>';
+  });
+  el.innerHTML=html;
+  // lists
+  var sh='';
+  S.sessions.slice(-8).reverse().forEach(function(s){
+    sh+='<div class="log"><div class="d">'+fmtD(s.date)+'</div><div class="b">'+
+      '<div class="t1"><span class="pill '+(PILL[s.type]||'p-bat')+'">'+esc(s.type.toUpperCase())+'</span>'+(+s.min||0)+' min'+
+      (s.rate?' · '+esc(String(s.rate))+'/5':'')+'</div>'+(s.note?'<div class="t2">'+esc(s.note)+'</div>':'')+'</div>'+
+      '<button class="xdel" onclick="delSes('+s.ts+')">✕</button></div>';
+  });
+  document.getElementById('sesList').innerHTML=sh||'<div class="empty">No sessions yet — today is day one</div>';
+  var mh='';
+  S.matches.slice(-8).reverse().forEach(function(m){
+    var sr=(+m.balls)?Math.round((+m.runs)/(+m.balls)*1000)/10:null;
+    mh+='<div class="log"><div class="d">'+fmtD(m.date)+'</div><div class="b">'+
+      '<div class="t1">'+(+m.runs||0)+(m.out==='no'?'*':'')+' ('+(+m.balls||0)+')'+(sr!=null?' · SR '+sr:'')+
+      ' <span class="t2" style="display:inline">vs '+esc(m.opp||'—')+'</span></div>'+
+      (m.note?'<div class="t2">'+esc(m.note)+'</div>':'')+'</div>'+
+      '<button class="xdel" onclick="delMatch('+m.ts+')">✕</button></div>';
+  });
+  document.getElementById('matchList').innerHTML=mh||'<div class="empty">No innings yet — first match coming</div>';
+}
+function addSession(){
+  var min=+document.getElementById('lgMin').value,dt=document.getElementById('lgDate').value;
+  if(!dt||!min){toast('Date + minutes needed');return;}
+  S.sessions.push({ts:Date.now(),date:dt,type:document.getElementById('lgType').value,min:min,
+    rate:document.getElementById('lgRate').value,note:document.getElementById('lgNote').value.trim()});
+  document.getElementById('lgMin').value='';document.getElementById('lgNote').value='';
+  save();renderCricket();renderHome();renderInsights();toast('Session logged');
+}
+function delSes(ts){S.sessions=S.sessions.filter(function(s){return s.ts!==ts;});save();renderCricket();renderHome();renderInsights();}
+function addMatch(){
+  var dt=document.getElementById('mDate').value,runs=document.getElementById('mRuns').value;
+  if(!dt||runs===''){toast('Date + runs needed');return;}
+  S.matches.push({ts:Date.now(),date:dt,opp:document.getElementById('mOpp').value.trim(),runs:+runs,
+    balls:+document.getElementById('mBalls').value||0,out:document.getElementById('mOut').value,
+    note:document.getElementById('mNote').value.trim()});
+  ['mOpp','mRuns','mBalls','mNote'].forEach(function(i){document.getElementById(i).value='';});
+  save();renderCricket();renderHome();toast('Innings logged');
+}
+function delMatch(ts){S.matches=S.matches.filter(function(m){return m.ts!==ts;});save();renderCricket();renderHome();}
+
+/* ============================================================
+   BODY (weights + PBs)
+============================================================ */
+function renderBody(){
+  document.getElementById('wDate').value=document.getElementById('wDate').value||today();
+  var html='';
+  S.weights.slice(-4).reverse().forEach(function(w){
+    html+='<div class="log"><div class="d">'+fmtD(w.date)+'</div><div class="b"><div class="t1">'+w.kg+' kg</div></div>'+
+      '<button class="xdel" onclick="delWeight('+w.ts+')">✕</button></div>';
+  });
+  S.prs.slice().reverse().forEach(function(p){
+    html+='<div class="log"><div class="d">PB</div><div class="b"><div class="t1">'+esc(p.name)+'</div>'+
+      '<div class="t2">'+esc(p.val)+' · '+fmtD(p.date)+'</div></div>'+
+      '<button class="xdel" onclick="delPr('+p.ts+')">✕</button></div>';
+  });
+  document.getElementById('bodyList').innerHTML=html||'<div class="empty">Log weight weekly + PBs monthly</div>';
+}
+function addWeight(){
+  var kg=+document.getElementById('wKg').value,dt=document.getElementById('wDate').value;
+  if(!kg||!dt){toast('Enter weight');return;}
+  S.weights.push({ts:Date.now(),date:dt,kg:kg});
+  S.weights.sort(function(a,b){return a.date<b.date?-1:1;});
+  document.getElementById('wKg').value='';save();renderBody();toast('Logged');
+}
+function delWeight(ts){S.weights=S.weights.filter(function(w){return w.ts!==ts;});save();renderBody();}
+function addPr(){
+  var n=document.getElementById('prName').value.trim(),v=document.getElementById('prVal').value.trim();
+  if(!n||!v){toast('Name + result needed');return;}
+  S.prs.push({ts:Date.now(),date:today(),name:n,val:v});
+  document.getElementById('prName').value='';document.getElementById('prVal').value='';
+  save();renderBody();toast('PB saved');
+}
+function delPr(ts){S.prs=S.prs.filter(function(p){return p.ts!==ts;});save();renderBody();}
+
+/* ============================================================
+   GOALS / MORE
+============================================================ */
+var PHASES=['Summer · SAT','Semester 1','Semester 2','Cricket Year','The Dream'];
+function renderGoals(){
+  var el=document.getElementById('goalList'),html='';
+  PHASES.forEach(function(ph){
+    var gs=S.goals.filter(function(g){return g.phase===ph;});
+    if(!gs.length)return;
+    var dn=gs.filter(function(g){return g.done;}).length;
+    html+='<div class="phh2">'+ph+' — '+dn+'/'+gs.length+'</div>';
+    gs.forEach(function(g){
+      html+='<div class="gl'+(g.done?' done':'')+'" onclick="togGoal(\''+g.id+'\')">'+
+        '<div class="cb">'+CHECK+'</div><div class="nm">'+esc(g.name)+'</div>'+
+        '<button class="xdel" onclick="event.stopPropagation();delGoal(\''+g.id+'\')">✕</button></div>';
+    });
+  });
+  el.innerHTML=html;
+}
+function togGoal(id){var g=S.goals.find(function(x){return x.id===id;});
+  if(g){g.done=!g.done;save();renderGoals();if(g.done)toast('Milestone ✓');}}
+function delGoal(id){if(!confirm('Delete milestone?'))return;
+  S.goals=S.goals.filter(function(g){return g.id!==id;});save();renderGoals();}
+function addGoal(){
+  var v=document.getElementById('gNew').value.trim();if(!v)return;
+  S.goals.push({id:'g'+Date.now(),phase:document.getElementById('gNewPh').value,name:v,done:false});
+  document.getElementById('gNew').value='';save();renderGoals();toast('Added');
+}
+function renderMore(){
+  var el=document.getElementById('jList'),html='';
+  Object.keys(S.days).sort().reverse().slice(0,40).forEach(function(k){
+    if(S.days[k].j){
+      var g=gradeEntry(S.days[k].j);
+      html+='<div class="jrn"><div class="d">'+fmtD(k)+'<span class="sc">'+g.score+'/10</span></div>'+
+        '<div class="t">'+esc(S.days[k].j)+'</div></div>';
+    }
+  });
+  el.innerHTML=html||'<div class="empty">Entries appear here with Coach scores</div>';
+}
+function exportData(){
+  var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='cricket-scholar-v2-backup-'+today()+'.json';a.click();toast('Backup downloaded');
+}
+function importData(ev){
+  var f=ev.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{var d=JSON.parse(r.result);if(!d.courses||!d.habits)throw 0;
+      if(!d.sat)d.sat={date:'2026-09-12',goal:1450,tests:[]};
+      if(!d.wo)d.wo={doneDate:'',pick:{},counts:{}};
+      if(!d.plans)d.plans={};
+      S=d;save();renderAll();toast('Backup restored');
+    }catch(e){toast('Invalid backup file');}
+  };
+  r.readAsText(f);ev.target.value='';
+}
+function resetAll(){
+  if(!confirm('Delete ALL data and start fresh? Export a backup first!'))return;
+  localStorage.removeItem(KEY);S=load();save();renderAll();toast('Fresh start');
+}
+
+/* ============================================================
+   NAV / INIT
+============================================================ */
+document.getElementById('nav').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('nav button').forEach(function(x){x.classList.remove('on');});
+  b.classList.add('on');
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('pg-'+b.dataset.p).classList.add('on');
+  window.scrollTo({top:0});
+});
+function renderAll(){
+  renderHome();renderSat();renderSchool();renderCricket();
+  renderCoachWorkout();renderPlan();renderWeekReview();renderJournalReview();renderJChart();renderInsights();renderBody();
+  renderGoals();renderMore();
+}
+renderAll();
+</script>
+</body>
+</html>
