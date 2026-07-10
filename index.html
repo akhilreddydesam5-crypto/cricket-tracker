@@ -498,13 +498,16 @@ h1.big em{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400
   </div>
 
   <div class="card">
-    <h2>CricClubs <span class="sub">your official league stats</span></h2>
+    <h2>CricClubs — import everything from one link</h2>
     <div class="frm">
-      <input id="ccId" placeholder="Paste your CricClubs profile link (Share → Copy link) or player ID" class="wide">
-      <button class="btn" onclick="saveCC()">Save</button>
+      <input id="ccId" placeholder="Paste your CricClubs profile link (viewPlayer.do…)" class="wide">
+      <button class="btn2" onclick="saveCC()">Save link</button>
+      <button class="btn" onclick="ccImport()">⚡ Import my stats</button>
     </div>
     <div id="ccLink"></div>
-    <p class="mut" style="margin-top:9px">Official scorecards live on CricClubs — one tap to open your profile and cross-check. CricClubs doesn't offer a public feed this private page can pull from, so log each innings above too (20 seconds) and your per-format averages stay live here.</p>
+    <div id="ccProg" class="mut" style="margin-top:8px"></div>
+    <div id="ccPreview" style="margin-top:6px"></div>
+    <p class="mut" style="margin-top:9px">Import pulls your batting table from this league AND every other league linked on your profile — check the rows, set each format, apply. Your whole career lands in "Career by format" in one shot. (Import runs through this site's own server, so it works on the deployed site — not the file opened from your desktop.)</p>
   </div>
 </section>
 
@@ -1422,6 +1425,110 @@ function renderCC(){
   el.innerHTML=(v.indexOf('http')===0)
     ?'<a href="'+esc(v)+'" target="_blank" rel="noopener" class="btn2" style="display:inline-block;margin-top:6px;text-decoration:none">Open my CricClubs profile ↗</a>'
     :'<div class="mut" style="margin-top:6px">Saved ID: <b style="color:var(--txt)">'+esc(v)+'</b> · <a href="https://cricclubs.com" target="_blank" rel="noopener" style="color:var(--acc)">open CricClubs ↗</a></div>';
+}
+/* ---- CricClubs one-link importer ---- */
+var CC_ROWS=[];
+function ccGuess(s){
+  s=(s||'').toUpperCase();
+  if(/T20/.test(s))return 'T20';
+  if(/T10/.test(s))return 'T10';
+  if(/T30|T40/.test(s))return 'T30/T40';
+  if(/1\s*DAY|ONE\s*DAY|50\s*OV|45\s*OV|40\s*OV|ODI/.test(s))return 'One Day (50 ov)';
+  if(/TEST|MULTI|2\s*DAY/.test(s))return 'Multi-day';
+  if(/PRACTICE|FRIENDLY/.test(s))return 'Practice match';
+  return 'T20';
+}
+function ccParse(html,league){
+  var doc=new DOMParser().parseFromString(html,'text/html');
+  var out={rows:[],links:[]};
+  doc.querySelectorAll('table').forEach(function(tb){
+    var head=(tb.rows[0]&&tb.rows[0].textContent||'').replace(/\s+/g,' ');
+    if(head.indexOf('Series Type')<0||head.indexOf('Runs')<0||head.indexOf('SR')<0)return;
+    if(/Wkts|Wickets|Overs|Maidens/i.test(head))return;
+    for(var r=1;r<tb.rows.length;r++){
+      var c=tb.rows[r].cells;if(!c||c.length<8)continue;
+      var series=(c[0].textContent||'').trim();
+      var inns=+((c[2].textContent||'').replace(/[^\d]/g,''))||0;
+      var no=+((c[3].textContent||'').replace(/[^\d]/g,''))||0;
+      var runs=+((c[4].textContent||'').replace(/[^\d]/g,''))||0;
+      var balls=+((c[5].textContent||'').replace(/[^\d]/g,''))||0;
+      if(!inns&&!runs)continue;
+      out.rows.push({league:league,series:series,inns:inns,no:no,runs:runs,balls:balls,fmt:ccGuess(series),use:true});
+    }
+  });
+  doc.querySelectorAll('a[href*="viewPlayer.do"]').forEach(function(a){
+    var h=a.getAttribute('href')||'';
+    if(h.indexOf('playerId=')<0)return;
+    if(h.indexOf('http')!==0)h='https://cricclubs.com'+(h.charAt(0)==='/'?'':'/')+h;
+    out.links.push(h);
+  });
+  return out;
+}
+function ccLeagueName(u){var m=u.match(/cricclubs\.com\/([^\/]+)\//);return m?decodeURIComponent(m[1]):'League';}
+function ccFetch(u){
+  return fetch('/api/cricclubs?url='+encodeURIComponent(u)).then(function(r){
+    if(!r.ok)throw new Error('proxy '+r.status);
+    return r.text();
+  });
+}
+function ccImport(){
+  var u=(document.getElementById('ccId').value||S.cricclubs||'').trim();
+  var prog=document.getElementById('ccProg');
+  if(u.indexOf('http')!==0||u.indexOf('cricclubs.com')<0){toast('Paste your full CricClubs profile link first');return;}
+  if(location.protocol==='file:'){prog.textContent='Import needs the deployed site (vercel.app) — open your live URL and run it there.';return;}
+  S.cricclubs=u;save();renderCC();
+  CC_ROWS=[];var seen={};seen[u.split('?')[0]]=1;
+  prog.textContent='Reading your profile…';
+  document.getElementById('ccPreview').innerHTML='';
+  ccFetch(u).then(function(html){
+    var p=ccParse(html,ccLeagueName(u));
+    CC_ROWS=p.rows;
+    var queue=[];
+    p.links.forEach(function(l){var k=l.split('?')[0];if(!seen[k]&&queue.length<20){seen[k]=1;queue.push(l);}});
+    var i=0;
+    function next(){
+      if(i>=queue.length){ccDone();return;}
+      var l=queue[i++];
+      prog.textContent='Reading league '+i+' of '+queue.length+' — '+ccLeagueName(l)+'…';
+      ccFetch(l).then(function(h){
+        ccParse(h,ccLeagueName(l)).rows.forEach(function(r){CC_ROWS.push(r);});
+        setTimeout(next,250);
+      }).catch(function(){setTimeout(next,250);});
+    }
+    next();
+  }).catch(function(e){
+    prog.textContent='Could not reach CricClubs through the site server ('+e.message+'). Hard-refresh the live site and try again.';
+  });
+}
+function ccDone(){
+  var prog=document.getElementById('ccProg');
+  if(!CC_ROWS.length){prog.textContent='No batting rows found — is the link your viewPlayer.do profile page?';return;}
+  prog.textContent='Found '+CC_ROWS.length+' stat rows across your leagues. Untick any you don’t want, set formats, then apply:';
+  ccRenderPreview();
+}
+function ccRenderPreview(){
+  var el=document.getElementById('ccPreview'),html='';
+  CC_ROWS.forEach(function(r,i){
+    html+='<div class="hab" style="cursor:default"><div class="cb" style="cursor:pointer" onclick="CC_ROWS['+i+'].use=!CC_ROWS['+i+'].use;ccRenderPreview()">'+(r.use?CHECK:'')+'</div>'+
+      '<div class="nm" style="flex:1;min-width:0"><b>'+esc(r.league)+'</b> · '+esc(r.series)+'<br><span class="mut">'+r.inns+' inns · '+r.runs+' runs · '+r.balls+' balls · '+r.no+' NO</span></div>'+
+      '<select style="width:120px" onchange="CC_ROWS['+i+'].fmt=this.value">'+FMTS.map(function(f){return '<option'+(f===r.fmt?' selected':'')+'>'+f+'</option>';}).join('')+'</select></div>';
+  });
+  html+='<button class="btn" style="margin-top:8px" onclick="ccApply()">Apply — set my career baselines</button>';
+  el.innerHTML=html;
+}
+function ccApply(){
+  var sums={};
+  CC_ROWS.forEach(function(r){
+    if(!r.use)return;
+    if(!sums[r.fmt])sums[r.fmt]={inns:0,runs:0,balls:0,no:0};
+    sums[r.fmt].inns+=r.inns;sums[r.fmt].runs+=r.runs;sums[r.fmt].balls+=r.balls;sums[r.fmt].no+=r.no;
+  });
+  var n=0;
+  Object.keys(sums).forEach(function(f){S.baseline[f]=sums[f];n++;});
+  save();renderCricket();renderHome();loadBaseline();
+  document.getElementById('ccPreview').innerHTML='';
+  document.getElementById('ccProg').textContent='Done — '+n+' format baseline'+(n===1?'':'s')+' set from your CricClubs career. New innings you log stack on top.';
+  toast('Career imported 🏏');
 }
 function addSession(){
   var min=+document.getElementById('lgMin').value,dt=document.getElementById('lgDate').value;
